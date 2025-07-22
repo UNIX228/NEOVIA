@@ -1,57 +1,61 @@
 # NEOVIA
 
-**NEOVIA** is a universal enhancement system for Nintendo Switch games that improves graphics and performance **without overclocking**.  
-Everything works from a single folder named `/graphics/` on your SD card. All controls are managed through the NEOVIA application.
+**NEOVIA** is a universal graphics and performance enhancement system for Nintendo Switch games that improves visuals and performance **without overclocking**.
 
-NEOVIA does **not** overclock your console or touch hardware frequencies.  
-Improvements are achieved through advanced configuration of shaders, textures, LOD, filtering, and other graphical components.
+Everything works from a single `/graphics/` folder on your SD card. All controls are managed through the NEOVIA app.
+
+NEOVIA does **not** overclock your console's CPU, GPU, or touchscreen frequencies.
+
+Improvements are achieved through advanced configuration of shaders, textures, level of detail, filtering, and other graphical components.
 
 ---
 
 ## 📌 Key Features
 
-- Enhanced graphics and smoother FPS without touching hardware limits  
-- Centralized control through a user-friendly application  
-- Game-specific profiles for visuals, performance, or size optimization  
-- Auto-loads enhancements when games start, and unloads on exit  
-- Entirely self-contained in a single `/graphics/` folder  
-- Simple "one-click" configuration per game  
-- Compatible with all Switch games  
-- Shader, texture, LOD, and filtering control  
+- Enhanced graphics and smoother FPS without breaking hardware limitations
+- Centralized management through a user-friendly app
+- Per-game profiles: optimize for graphics, performance, or size
+- Automatic enhancement loading at game launch and removal on exit
+- Fully self-contained `/graphics/` folder
+- One-click optimization for each game
+- Compatibility with the most popular Switch games
+- Control over shaders, textures, LOD, and filtering
 
 ---
 
 ## ⚙️ Requirements
 
-- **SaltyNX** and **SaltySD** installed (recommended)  
-- 3–5 GB free space for up to 20 games (depending on profile type)
+- Installed **SaltyNX** and **SaltySD** (recommended)
+- 5–10 GB free space for up to 20 games (recommended)
 
 ---
 
 ## 🚀 Installation
 
-1. Copy the `/graphics/` folder to the root of your SD card  
-2. Make sure SaltyNX and SaltySD are installed  
-3. Launch `NEOVIA.nro` from your homebrew menu  
-4. Select a game and choose a graphics profile  
-5. Press "Apply" — NEOVIA will handle everything automatically  
-6. Start your game — enhancements will be applied instantly
+1. Copy the `/graphics/` folder to your SD card root
+2. Ensure SaltyNX and SaltySD are installed
+3. Launch `NEOVIA.nro` from the Homebrew menu
+4. Exit the application and reboot your console
+5. Relaunch the app with internet connection
+6. Select a game and graphics profile
+7. Press "Enhance" — NEOVIA will handle everything automatically
+8. Launch your game — improvements will be applied instantly
 
 ---
 
 ## 🛠 Usage
 
-- 🔹 **Action logging and feedback**  
-- 🔹 **Automatic cache cleanup after game exit**  
-- 🔹 **Fully isolated — no system file changes**  
-- 🔹 **Compatible with all firmware and game versions**
+- 🔹 Action logging and feedback system
+- 🔹 Automatic cache cleanup after exiting games
+- 🔹 Complete isolation — no system files modified
+- 🔹 Compatible with all firmware and game versions
 
 ---
 
 ## 📬 Contact
 
-Got suggestions or issues? Open an issue here on GitHub.
+Have suggestions or issues? Create an issue here on GitHub.
 
 ---
 
-**NEOVIA — next-level graphics. No overclocking. Just results.**
+**NEOVIA — Next-level graphics. No overclocking. Just results.**
