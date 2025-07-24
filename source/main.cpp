@@ -4,11 +4,17 @@
 #include <string.h>
 #include <curl/curl.h>
 #include "neovia.h"
-#include "graphics.h"
-#include "gui.h"
 #include "config.h"
 #include "downloader.h"
 #include "game_database.h"
+
+// Включаем простой GUI
+extern class SimpleGUI {
+public:
+    bool initialize(Config* cfg);
+    void render();
+    void handleInput(u64 kDown);
+} g_simpleGui;
 
 // Глобальные переменные
 AppletHookCookie g_appletHookCookie;
@@ -91,80 +97,22 @@ Result createDirectoryStructure() {
     return 0;
 }
 
-// Обработчик кнопки "Улучшить"
-void onEnhanceButtonClicked() {
-    g_gui->setStatusText("Сканирование игр...");
-    
-    // Получаем список установленных игр
-    std::vector<GameInfo> games;
-    Result rc = scanInstalledGames(games);
-    
-    if (R_SUCCEEDED(rc) && !games.empty()) {
-        g_gui->setStatusText("Загрузка модов...");
-        
-        // Загружаем моды для первых 5 игр
-        int processed = 0;
-        for (const auto& game : games) {
-            if (processed >= 5) break;
-            
-            rc = downloadModsForGame(game.titleId);
-            if (R_SUCCEEDED(rc)) {
-                processed++;
-            }
-        }
-        
-        if (processed > 0) {
-            g_gui->setStatusText("Готово! Обработано игр: " + std::to_string(processed));
-        } else {
-            g_gui->setStatusText("Ошибка загрузки модов");
-        }
-    } else {
-        g_gui->setStatusText("Игры не найдены");
-    }
-}
-
-// Обработчик настроек
-void onSettingsButtonClicked() {
-    // Переходим в меню настроек
-    g_gui->setState(GUIState::Settings);
-}
-
-// Обработчик "О нас"
-void onAboutButtonClicked() {
-    // Переходим в меню "О нас"
-    g_gui->setState(GUIState::About);
-}
+// Обработчики убраны - теперь используется SimpleGUI
 
 int main(int argc, char* argv[]) {
     Result rc = 0;
+    
+    // Инициализация консоли
+    consoleInit(NULL);
     
     // Инициализация контроллера
     PadState pad;
     padConfigureInput(1, HidNpadStyleSet_NpadStandard);
     padInitializeDefault(&pad);
     
-    // Инициализация графической системы
-    g_graphics = std::make_unique<GraphicsSystem>();
-    if (!g_graphics->initialize()) {
-        // Откат к консольному режиму при ошибке
-        consoleInit(NULL);
-        printf("Ошибка инициализации графики\n");
-        printf("Нажмите + для выхода\n");
-        
-        while (appletMainLoop() && !g_exitRequested) {
-            padUpdate(&pad);
-            u64 kDown = padGetButtonsDown(&pad);
-            if (kDown & HidNpadButton_Plus) break;
-            consoleUpdate(NULL);
-        }
-        return -1;
-    }
-    
     // Инициализация приложения
     rc = initializeApp();
     if (R_FAILED(rc)) {
-        g_graphics->shutdown();
-        consoleInit(NULL);
         printf("Ошибка инициализации: 0x%x\n", rc);
         printf("Нажмите + для выхода\n");
         
@@ -184,28 +132,15 @@ int main(int argc, char* argv[]) {
     Config config;
     loadConfig(config);
     
-    // Инициализация GUI
-    g_gui = std::make_unique<NEOVIA_GUI>();
-    if (!g_gui->initialize(&config)) {
-        g_graphics->shutdown();
+    // Инициализация простого GUI
+    if (!g_simpleGui.initialize(&config)) {
+        printf("Ошибка инициализации GUI\n");
         shutdownApp();
         return -1;
     }
     
-    // Устанавливаем обработчики событий
-    g_gui->setOnEnhanceClicked(onEnhanceButtonClicked);
-    g_gui->setOnSettingsClicked(onSettingsButtonClicked);
-    g_gui->setOnAboutClicked(onAboutButtonClicked);
-    
-    // Главный цикл с GUI
-    u64 lastTime = armGetSystemTick();
-    
+    // Главный цикл с простым GUI
     while (appletMainLoop() && !g_exitRequested) {
-        // Вычисляем delta time
-        u64 currentTime = armGetSystemTick();
-        float deltaTime = (float)(currentTime - lastTime) / armGetSystemTickFreq();
-        lastTime = currentTime;
-        
         // Обработка ввода
         padUpdate(&pad);
         u64 kDown = padGetButtonsDown(&pad);
@@ -217,19 +152,13 @@ int main(int argc, char* argv[]) {
         }
         
         // Передаем ввод в GUI
-        Point touchPos = {640, 360}; // Центр экрана по умолчанию
-        g_gui->handleInput(kDown, touchPos);
-        
-        // Обновляем GUI
-        g_gui->update(deltaTime);
+        g_simpleGui.handleInput(kDown);
         
         // Рендерим GUI
-        g_gui->render();
+        g_simpleGui.render();
     }
     
     // Завершение работы
-    g_gui->shutdown();
-    g_graphics->shutdown();
     shutdownApp();
     
     return 0;

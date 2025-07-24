@@ -61,25 +61,45 @@ bool GraphicsSystem::initialize() {
     
     cmdbuf.addMemory(cmdMemBlock, 0, cmdMemBlock.getSize());
     
-    // Создаем swapchain
-    swapchain = dk::SwapchainMaker{device, nwindowGetDefault(), queue}
-        .create();
-    if (!swapchain) return false;
+    // Создаем изображения для swapchain
+    static constexpr uint32_t NumFramebuffers = 2;
+    dk::UniqueImage framebuffers[NumFramebuffers];
     
-    // Выделяем память для framebuffer
-    auto layout = dk::ImageLayout{};
+    // Создаем layout для изображений
+    dk::ImageLayout layout;
     dk::ImageLayoutMaker{device}
         .setFlags(DkImageFlags_UsageRender | DkImageFlags_HwCompression)
         .setFormat(DkImageFormat_RGBA8_Unorm)
         .setDimensions(SCREEN_WIDTH, SCREEN_HEIGHT)
         .initialize(layout);
     
-    auto memReq = layout.getMemoryRequirement();
-    fbMemBlock = dk::MemBlockMaker{device, memReq.size}
+    uint32_t fbSize = layout.getSize();
+    uint32_t fbAlign = layout.getAlignment();
+    
+    // Выделяем память для framebuffer
+    fbMemBlock = dk::MemBlockMaker{device, fbSize * NumFramebuffers}
         .setFlags(DkMemBlockFlags_GpuCached | DkMemBlockFlags_Image)
         .create();
     
     if (!fbMemBlock) return false;
+    
+    // Создаем изображения
+    for (uint32_t i = 0; i < NumFramebuffers; i++) {
+        framebuffers[i] = dk::ImageMaker{device, layout}
+            .setMemory(fbMemBlock, fbSize * i)
+            .create();
+    }
+    
+    // Создаем swapchain с изображениями
+    std::array<DkImage const*, NumFramebuffers> swapchainImages;
+    for (uint32_t i = 0; i < NumFramebuffers; i++) {
+        swapchainImages[i] = &framebuffers[i];
+    }
+    
+    swapchain = dk::SwapchainMaker{device, nwindowGetDefault(), swapchainImages}
+        .create();
+    
+    if (!swapchain) return false;
     
     initialized = true;
     return true;
@@ -107,11 +127,12 @@ void GraphicsSystem::beginFrame() {
     // Начинаем запись команд
     cmdbuf.clear();
     
-    // Очищаем экран серым цветом
-    DkImageView colorTarget{};
-    swapchain.acquireImage(colorTarget);
+    // Получаем текущее изображение
+    int imageSlot;
+    DkFence fence{};
+    swapchain.acquireImage(imageSlot, fence);
     
-    cmdbuf.bindRenderTargets(&colorTarget);
+    // Очищаем экран серым цветом (упрощенная версия)
     cmdbuf.setScissors(0, DkScissor{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
     cmdbuf.clearColor(0, DkColorMask_RGBA, 0.26f, 0.26f, 0.26f, 1.0f); // Серый фон
     
@@ -164,22 +185,8 @@ void GraphicsSystem::handleInput(u64 kDown, Point touchPos) {
 void GraphicsSystem::drawRect(Rect rect, Color color) {
     if (!initialized) return;
     
-    // Преобразуем координаты в NDC
-    float x1 = (rect.x / SCREEN_WIDTH) * 2.0f - 1.0f;
-    float y1 = 1.0f - (rect.y / SCREEN_HEIGHT) * 2.0f;
-    float x2 = ((rect.x + rect.width) / SCREEN_WIDTH) * 2.0f - 1.0f;
-    float y2 = 1.0f - ((rect.y + rect.height) / SCREEN_HEIGHT) * 2.0f;
-    
-    // Вершины прямоугольника
-    float vertices[] = {
-        x1, y1, color.r, color.g, color.b, color.a,
-        x2, y1, color.r, color.g, color.b, color.a,
-        x1, y2, color.r, color.g, color.b, color.a,
-        x2, y2, color.r, color.g, color.b, color.a,
-    };
-    
-    // Отправляем вершины (упрощенная версия)
-    // В реальной реализации нужно создать vertex buffer и использовать шейдеры
+    // Заглушка для отрисовки прямоугольников
+    // В полной реализации здесь будет создание vertex buffer и рендеринг
 }
 
 void GraphicsSystem::drawText(Point pos, const std::string& text, Color color, float size) {
