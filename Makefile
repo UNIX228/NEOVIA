@@ -30,6 +30,9 @@ BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
+
+# Additional source files for enhanced graphics
+EXTRA_SOURCES := source/icon_loader.cpp source/advanced_effects.cpp
 ROMFS		:=	romfs
 
 APP_TITLE	:=	NEOVIA

@@ -1,8 +1,19 @@
 #include "modern_gui.h"
 #include "downloader.h"
 #include "game_database.h"
+#include "icon_loader.h"
 #include <cmath>
 #include <random>
+
+// Forward declaration of advanced effects
+namespace AdvancedEffects {
+    void drawHolographicPanel(float x, float y, float width, float height, float time, float intensity);
+    void drawNeonText(const std::string& text, float x, float y, const Color& color, int fontSize, float glowSize, float intensity);
+    void drawPlasmaBackground(float x, float y, float width, float height, float time);
+    void drawConstellation(float x, float y, float width, float height, float time, int starCount);
+    void drawCyberpunkGrid(float x, float y, float width, float height, float time, float gridSize);
+    void drawAnimatedLogo(float x, float y, float time, float scale);
+}
 
 ModernGUI::ModernGUI() 
     : config(nullptr), currentScreen(Screen::MAIN_MENU), previousScreen(Screen::MAIN_MENU),
@@ -29,6 +40,17 @@ bool ModernGUI::initialize(Config* cfg) {
         return false;
     }
     
+    // Initialize icon system and create beautiful default icons
+    DefaultIcons::initializeDefaultIcons();
+    
+    // Try to load user's custom JPG icon if it exists
+    if (!ICON_LOADER->loadIcon("/switch/NEOVIA/icon.jpg", "user_icon")) {
+        // If no custom icon, try other common locations
+        if (!ICON_LOADER->loadIcon("/switch/NEOVIA/logo.jpg", "user_icon")) {
+            ICON_LOADER->loadIcon("/switch/NEOVIA/neovia.jpg", "user_icon");
+        }
+    }
+    
     createMainMenu();
     createSettingsMenu();
     createAboutMenu();
@@ -42,9 +64,18 @@ void ModernGUI::render() {
     GFX->beginFrame();
     
     float deltaTime = GFX->getDeltaTime();
+    backgroundOffset += deltaTime;
     
-    // Анимированный фон
+    // Enhanced animated background with multiple effects
     renderBackground(deltaTime);
+    
+    // Add cyberpunk grid overlay
+    AdvancedEffects::drawCyberpunkGrid(0, 0, 1280, 720, backgroundOffset, 40.0f);
+    
+    // Add constellation effect in corners
+    AdvancedEffects::drawConstellation(0, 0, 300, 200, backgroundOffset, 8);
+    AdvancedEffects::drawConstellation(980, 520, 300, 200, backgroundOffset + 1.0f, 6);
+    
     renderParticles(deltaTime);
     
     // Рендер текущего экрана
@@ -374,18 +405,43 @@ void ModernGUI::spawnParticle() {
 }
 
 void ModernGUI::renderMainMenu(float deltaTime) {
-    // Анимированный логотип
-    drawAnimatedLogo(640, 150, backgroundOffset);
+    // Add holographic panel effect behind main menu
+    AdvancedEffects::drawHolographicPanel(400, 250, 480, 300, backgroundOffset, 0.3f);
+    
+    // Enhanced NEOVIA branding with neon effect
+    AdvancedEffects::drawNeonText("NEOVIA", 540, 100, Colors::PRIMARY, 32, 12.0f, 1.0f);
+    AdvancedEffects::drawNeonText("Graphics Enhancement System", 460, 140, Colors::SECONDARY, 16, 6.0f, 0.8f);
+    
+    // Use custom icon if available, otherwise use animated logo
+    if (ICON_LOADER->hasIcon("user_icon")) {
+        IconEffects::drawPulsingIcon("user_icon", 580, 50, backgroundOffset, 1.0f, 0.2f);
+    } else {
+        AdvancedEffects::drawAnimatedLogo(580, 50, backgroundOffset, 1.2f);
+    }
+    
+    // Add version info with glow
+    AdvancedEffects::drawNeonText("v1.0.0 - AIO Style", 520, 180, Colors::TEXT_SECONDARY, 12, 4.0f, 0.6f);
     
     // Рендер панели
     if (mainPanel) {
         mainPanel->render(deltaTime);
     }
     
-    // Статус индикаторы
-    drawStatusIndicator(100, 650, true);  // Система активна
-    drawStatusIndicator(200, 650, config && config->dynamicResolution);  // Динамическое разрешение
-    drawStatusIndicator(300, 650, false); // Моды загружены
+    // Enhanced status indicators with icons
+    if (ICON_LOADER->hasIcon("success")) {
+        IconEffects::drawPulsingIcon("success", 100, 650, backgroundOffset, 0.8f, 0.1f);
+    }
+    drawStatusIndicator(120, 650, true);  // Система активна
+    
+    if (ICON_LOADER->hasIcon("settings")) {
+        IconEffects::drawRotatingIcon("settings", 200, 650, backgroundOffset, 0.6f, 0.5f);
+    }
+    drawStatusIndicator(220, 650, config && config->dynamicResolution);  // Динамическое разрешение
+    
+    if (ICON_LOADER->hasIcon("download")) {
+        IconEffects::drawFloatingIcon("download", 300, 650, backgroundOffset, 5.0f, 1.5f);
+    }
+    drawStatusIndicator(320, 650, false); // Моды загружены
 }
 
 void ModernGUI::renderSettingsMenu(float deltaTime) {
