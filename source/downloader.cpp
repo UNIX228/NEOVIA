@@ -2,7 +2,7 @@
 #include "neovia.h"
 #include "game_database.h"
 #include <curl/curl.h>
-#include <json/json.h>
+// #include <json/json.h> // Убрано для упрощения
 #include <switch.h>
 #include <string>
 #include <fstream>
@@ -118,34 +118,28 @@ Result downloadFile(const std::string& url, const std::string& filePath) {
 
 // Создание modinfo.json для игры
 Result createModInfo(const std::string& gameId, const std::string& gameName) {
-    std::string modInfoPath = std::string(GRAPHICS_PATH) + gameId + "/modinfo.json";
-    
-    Json::Value root;
-    root["title"] = "High Quality Graphics Enhancement";
-    root["description"] = "Максимальное качество графики для " + gameName;
-    root["author"] = "Unix228";
-    root["version"] = "1.0.0";
-    root["gameId"] = gameId;
-    root["gameName"] = gameName;
-    root["priority"] = "graphics";
-    root["dynamicResolution"] = true;
-    root["antiAliasing"] = true;
-    root["textureQuality"] = "ultra";
-    root["shadowQuality"] = "high";
-    root["lightingQuality"] = "enhanced";
-    
-    Json::StreamWriterBuilder builder;
-    builder["indentation"] = "  ";
-    std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+    std::string modInfoPath = std::string(GRAPHICS_PATH) + gameId + "/modinfo.txt";
     
     std::ofstream file(modInfoPath);
     if (!file.is_open()) {
         return MAKERESULT(Module_Libnx, LibnxError_BadInput);
     }
     
-    writer->write(root, &file);
-    file.close();
+    // Простое сохранение информации о моде (без JSON)
+    file << "title=High Quality Graphics Enhancement" << std::endl;
+    file << "description=Максимальное качество графики для " << gameName << std::endl;
+    file << "author=Unix228" << std::endl;
+    file << "version=1.0.0" << std::endl;
+    file << "gameId=" << gameId << std::endl;
+    file << "gameName=" << gameName << std::endl;
+    file << "priority=graphics" << std::endl;
+    file << "dynamicResolution=true" << std::endl;
+    file << "antiAliasing=true" << std::endl;
+    file << "textureQuality=ultra" << std::endl;
+    file << "shadowQuality=high" << std::endl;
+    file << "lightingQuality=enhanced" << std::endl;
     
+    file.close();
     return 0;
 }
 

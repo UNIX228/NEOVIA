@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <cstring>
 
 // База данных популярных игр Nintendo Switch с их Title ID
 static const std::map<std::string, std::string> GAME_DATABASE = {
@@ -174,7 +175,7 @@ Result scanInstalledGames(std::vector<GameInfo>& games) {
     s32 recordCount = 0;
     
     // Получаем количество установленных приложений
-    rc = nsListApplicationRecord(records, 0, &recordCount);
+    rc = nsListApplicationRecord(records, 0, 0, &recordCount);
     if (R_FAILED(rc)) {
         return rc;
     }
@@ -190,7 +191,7 @@ Result scanInstalledGames(std::vector<GameInfo>& games) {
     }
     
     // Получаем список приложений
-    rc = nsListApplicationRecord(records, recordCount, &recordCount);
+    rc = nsListApplicationRecord(records, recordCount, 0, &recordCount);
     if (R_FAILED(rc)) {
         delete[] records;
         return rc;

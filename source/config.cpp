@@ -2,7 +2,7 @@
 #include "neovia.h"
 #include <switch.h>
 #include <fstream>
-#include <json/json.h>
+// #include <json/json.h> // Убрано для упрощения
 
 // Загрузка конфигурации из файла
 Result loadConfig(Config& config) {
@@ -19,53 +19,48 @@ Result loadConfig(Config& config) {
         return MAKERESULT(Module_Libnx, LibnxError_NotFound);
     }
     
-    Json::Value root;
-    Json::CharReaderBuilder builder;
-    std::string errors;
-    
-    if (!Json::parseFromStream(builder, file, &root, &errors)) {
-        file.close();
-        return MAKERESULT(Module_Libnx, LibnxError_BadInput);
+    // Простое чтение конфигурации (без JSON)
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.find("firstRun=") == 0) {
+            config.firstRun = (line.substr(9) == "true");
+        } else if (line.find("language=") == 0) {
+            config.language = static_cast<Language>(std::stoi(line.substr(9)));
+        } else if (line.find("priority=") == 0) {
+            config.priority = static_cast<Priority>(std::stoi(line.substr(9)));
+        } else if (line.find("dynamicResolution=") == 0) {
+            config.dynamicResolution = (line.substr(18) == "true");
+        } else if (line.find("downloadAllMods=") == 0) {
+            config.downloadAllMods = (line.substr(16) == "true");
+        } else if (line.find("autoStart=") == 0) {
+            config.autoStart = (line.substr(10) == "true");
+        } else if (line.find("extrasInstalled=") == 0) {
+            config.extrasInstalled = (line.substr(16) == "true");
+        }
     }
     
     file.close();
-    
-    // Загружаем настройки
-    config.firstRun = root.get("firstRun", true).asBool();
-    config.language = static_cast<Language>(root.get("language", LANG_RU).asInt());
-    config.priority = static_cast<Priority>(root.get("priority", PRIORITY_GRAPHICS).asInt());
-    config.dynamicResolution = root.get("dynamicResolution", true).asBool();
-    config.downloadAllMods = root.get("downloadAllMods", true).asBool();
-    config.autoStart = root.get("autoStart", false).asBool();
-    config.extrasInstalled = root.get("extrasInstalled", false).asBool();
     
     return 0;
 }
 
 // Сохранение конфигурации в файл
 Result saveConfig(const Config& config) {
-    Json::Value root;
-    
-    root["firstRun"] = config.firstRun;
-    root["language"] = static_cast<int>(config.language);
-    root["priority"] = static_cast<int>(config.priority);
-    root["dynamicResolution"] = config.dynamicResolution;
-    root["downloadAllMods"] = config.downloadAllMods;
-    root["autoStart"] = config.autoStart;
-    root["extrasInstalled"] = config.extrasInstalled;
-    
-    Json::StreamWriterBuilder builder;
-    builder["indentation"] = "  ";
-    std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
-    
     std::ofstream file(SETTINGS_PATH);
     if (!file.is_open()) {
         return MAKERESULT(Module_Libnx, LibnxError_BadInput);
     }
     
-    writer->write(root, &file);
-    file.close();
+    // Простое сохранение конфигурации (без JSON)
+    file << "firstRun=" << (config.firstRun ? "true" : "false") << std::endl;
+    file << "language=" << static_cast<int>(config.language) << std::endl;
+    file << "priority=" << static_cast<int>(config.priority) << std::endl;
+    file << "dynamicResolution=" << (config.dynamicResolution ? "true" : "false") << std::endl;
+    file << "downloadAllMods=" << (config.downloadAllMods ? "true" : "false") << std::endl;
+    file << "autoStart=" << (config.autoStart ? "true" : "false") << std::endl;
+    file << "extrasInstalled=" << (config.extrasInstalled ? "true" : "false") << std::endl;
     
+    file.close();
     return 0;
 }
 

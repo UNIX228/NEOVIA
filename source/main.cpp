@@ -5,7 +5,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <curl/curl.h>
-#include <json/json.h>
+// #include <json/json.h> // Убрано для упрощения
 #include "neovia.h"
 #include "ui.h"
 #include "downloader.h"
