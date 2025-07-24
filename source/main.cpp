@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
     // Инициализация интерфейса
     if (!g_interface.initialize()) {
         logToGraphics("NEOVIA", "CRITICAL ERROR: Failed to initialize interface!");
-        printf("Ошибка инициализации интерфейса!\n");
+        printf("Interface initialization failed!\n");
         consoleUpdate(NULL);
         
         while (appletMainLoop()) {
@@ -43,8 +43,8 @@ int main(int argc, char* argv[]) {
     }
     
     printf("🎮 NEOVIA v1.0.0\n");
-    printf("📱 Простой интерфейс загружен\n");
-    printf("🖼️ Иконка: %s\n", "icon.jpg найдена" );
+    printf("📱 Simple interface loaded\n");
+    printf("🖼️ Icon: %s\n", "icon.jpg found" );
     consoleUpdate(NULL);
     
     logToGraphics("NEOVIA", "Interface loaded successfully, entering main loop");

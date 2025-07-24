@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <ctime>
-#include <filesystem>
+#include <cstring>
 
 NeoCoreManager g_neoCore;
 
@@ -442,8 +442,9 @@ bool NeoCoreManager::updateFromExtraZip(const std::string& zipPath) {
 
 std::string NeoCoreManager::getCurrentTimeString() {
     time_t now = time(0);
-    char buffer[20];
-    strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", localtime(&now));
-    return std::string(buffer);
+    // Простое форматирование времени без strftime для совместимости с Switch
+    char buffer[32];
+    snprintf(buffer, sizeof(buffer), "%ld", (long)now);
+    return std::string("backup_") + std::string(buffer);
 }
 

@@ -150,7 +150,7 @@ void drawProgressWindow() {
     printf("│                                                                            │\n");
     
     if (g_currentProgress.error) {
-        printf("│ ОШИБКА: %-62s │\n", g_currentProgress.errorMessage.c_str());
+        printf("│ ERROR: %-64s │\n", g_currentProgress.errorMessage.c_str());
     } else if (g_currentProgress.completed) {
         std::string lang_completed = getLanguageString(g_currentConfig.language, "completed");
         printf("│ %s%*s │\n", lang_completed.c_str(), (int)(70 - lang_completed.length()), "");
