@@ -2,15 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
-#include <unistd.h>
 #include <curl/curl.h>
-// #include <json/json.h> // Убрано для упрощения
 #include "neovia.h"
-#include "ui.h"
+#include "graphics.h"
+#include "gui.h"
+#include "config.h"
 #include "downloader.h"
 #include "game_database.h"
-#include "config.h"
 
 // Глобальные переменные
 AppletHookCookie g_appletHookCookie;
@@ -21,244 +19,218 @@ Result initializeApp() {
     Result rc = 0;
     
     // Инициализация сервисов
-    rc = romfsInit();
-    if (R_FAILED(rc)) {
-        printf("romfsInit() failed: 0x%x\n", rc);
-        return rc;
-    }
+    rc = appletInitialize();
+    if (R_FAILED(rc)) return rc;
     
-    rc = socketInitializeDefault();
-    if (R_FAILED(rc)) {
-        printf("socketInitializeDefault() failed: 0x%x\n", rc);
-        return rc;
-    }
+    rc = hidInitialize();
+    if (R_FAILED(rc)) return rc;
     
-    rc = curl_global_init(CURL_GLOBAL_DEFAULT);
-    if (rc != CURLE_OK) {
-        printf("curl_global_init() failed: %d\n", rc);
-        return MAKERESULT(Module_Libnx, LibnxError_BadInput);
-    }
+    rc = fsInitialize();
+    if (R_FAILED(rc)) return rc;
     
     rc = nsInitialize();
-    if (R_FAILED(rc)) {
-        printf("nsInitialize() failed: 0x%x\n", rc);
-        return rc;
-    }
+    if (R_FAILED(rc)) return rc;
     
-    // Инициализация файловой системы
-    rc = fsInitialize();
-    if (R_FAILED(rc)) {
-        printf("fsInitialize() failed: 0x%x\n", rc);
-        return rc;
-    }
+    rc = socketInitializeDefault();
+    if (R_FAILED(rc)) return rc;
+    
+    rc = nifmInitialize(NifmServiceType_User);
+    if (R_FAILED(rc)) return rc;
+    
+    // Инициализация curl
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    
+    // Установка хука для выхода
+    appletHook(&g_appletHookCookie, [](AppletHookType hook, void* param) {
+        if (hook == AppletHookType_OnExitRequest) {
+            g_exitRequested = true;
+        }
+    }, nullptr);
     
     return 0;
 }
 
 // Завершение работы приложения
-void finalizeApp() {
+void shutdownApp() {
+    appletUnhook(&g_appletHookCookie);
     curl_global_cleanup();
+    nifmExit();
     socketExit();
     nsExit();
     fsExit();
-    romfsExit();
+    hidExit();
+    appletExit();
 }
 
-// Обработчик событий applet
-void appletHookFunc(AppletHookType hook, void* param) {
-    switch (hook) {
-        case AppletHookType_OnExitRequest:
-            g_exitRequested = true;
-            break;
-        default:
-            break;
-    }
-}
-
-// Создание базовой структуры папок
+// Создание структуры папок
 Result createDirectoryStructure() {
     Result rc = 0;
     
     // Создаем основную папку graphics
     rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), "/graphics");
     if (R_FAILED(rc) && rc != 0x402) { // 0x402 = уже существует
-        printf("Failed to create /graphics directory: 0x%x\n", rc);
         return rc;
     }
     
     // Создаем папку для NEOVIA
     rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), "/switch");
     if (R_FAILED(rc) && rc != 0x402) {
-        printf("Failed to create /switch directory: 0x%x\n", rc);
         return rc;
     }
     
     rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), "/switch/NEOVIA");
     if (R_FAILED(rc) && rc != 0x402) {
-        printf("Failed to create /switch/NEOVIA directory: 0x%x\n", rc);
         return rc;
     }
     
     rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), "/switch/NEOVIA/extras");
     if (R_FAILED(rc) && rc != 0x402) {
-        printf("Failed to create /switch/NEOVIA/extras directory: 0x%x\n", rc);
         return rc;
     }
     
     return 0;
 }
 
-// Первичная настройка при первом запуске
-Result firstTimeSetup() {
-    printf("Выполняется первичная настройка NEOVIA...\n");
-    consoleUpdate(NULL);
+// Обработчик кнопки "Улучшить"
+void onEnhanceButtonClicked() {
+    g_gui->setStatusText("Сканирование игр...");
     
-    // Создаем структуру папок
-    Result rc = createDirectoryStructure();
-    if (R_FAILED(rc)) {
-        return rc;
-    }
+    // Получаем список установленных игр
+    std::vector<GameInfo> games;
+    Result rc = scanInstalledGames(games);
     
-    // Сканируем установленные игры
-    printf("Сканирование установленных игр...\n");
-    consoleUpdate(NULL);
-    
-    std::vector<GameInfo> installedGames;
-    rc = scanInstalledGames(installedGames);
-    if (R_FAILED(rc)) {
-        printf("Ошибка сканирования игр: 0x%x\n", rc);
-        return rc;
-    }
-    
-    printf("Найдено игр: %zu\n", installedGames.size());
-    consoleUpdate(NULL);
-    
-    // Загружаем моды для найденных игр
-    for (const auto& game : installedGames) {
-        printf("Загрузка модов для: %s\n", game.name.c_str());
-        consoleUpdate(NULL);
+    if (R_SUCCEEDED(rc) && !games.empty()) {
+        g_gui->setStatusText("Загрузка модов...");
         
-        rc = downloadModsForGame(game.titleId);
-        if (R_FAILED(rc)) {
-            printf("Ошибка загрузки модов для %s: 0x%x\n", game.name.c_str(), rc);
+        // Загружаем моды для первых 5 игр
+        int processed = 0;
+        for (const auto& game : games) {
+            if (processed >= 5) break;
+            
+            rc = downloadModsForGame(game.titleId);
+            if (R_SUCCEEDED(rc)) {
+                processed++;
+            }
         }
+        
+        if (processed > 0) {
+            g_gui->setStatusText("Готово! Обработано игр: " + std::to_string(processed));
+        } else {
+            g_gui->setStatusText("Ошибка загрузки модов");
+        }
+    } else {
+        g_gui->setStatusText("Игры не найдены");
     }
-    
-    // Создаем конфигурационный файл
-    Config config;
-    config.firstRun = false;
-    config.language = LANG_RU;
-    config.priority = PRIORITY_GRAPHICS;
-    config.dynamicResolution = true;
-    config.downloadAllMods = true;
-    config.autoStart = false;
-    
-    rc = saveConfig(config);
-    if (R_FAILED(rc)) {
-        printf("Ошибка сохранения конфигурации: 0x%x\n", rc);
-        return rc;
-    }
-    
-    printf("Первичная настройка завершена!\n");
-    consoleUpdate(NULL);
-    sleep(2);
-    
-    return 0;
+}
+
+// Обработчик настроек
+void onSettingsButtonClicked() {
+    // Переходим в меню настроек
+    g_gui->setState(GUIState::Settings);
+}
+
+// Обработчик "О нас"
+void onAboutButtonClicked() {
+    // Переходим в меню "О нас"
+    g_gui->setState(GUIState::About);
 }
 
 int main(int argc, char* argv[]) {
     Result rc = 0;
-    
-    // Инициализация консоли для отладки
-    consoleInit(NULL);
     
     // Инициализация контроллера
     PadState pad;
     padConfigureInput(1, HidNpadStyleSet_NpadStandard);
     padInitializeDefault(&pad);
     
-    // Инициализация приложения
-    rc = initializeApp();
-    if (R_FAILED(rc)) {
-        printf("Ошибка инициализации: 0x%x\n", rc);
-        printf("Нажмите + для выхода.\n");
+    // Инициализация графической системы
+    g_graphics = std::make_unique<GraphicsSystem>();
+    if (!g_graphics->initialize()) {
+        // Откат к консольному режиму при ошибке
+        consoleInit(NULL);
+        printf("Ошибка инициализации графики\n");
+        printf("Нажмите + для выхода\n");
         
-        while (appletMainLoop()) {
+        while (appletMainLoop() && !g_exitRequested) {
             padUpdate(&pad);
             u64 kDown = padGetButtonsDown(&pad);
             if (kDown & HidNpadButton_Plus) break;
             consoleUpdate(NULL);
         }
-        
-        consoleExit(NULL);
-        return 1;
+        return -1;
     }
     
-    // Регистрируем обработчик событий applet
-    appletHook(&g_appletHookCookie, appletHookFunc, NULL);
+    // Инициализация приложения
+    rc = initializeApp();
+    if (R_FAILED(rc)) {
+        g_graphics->shutdown();
+        consoleInit(NULL);
+        printf("Ошибка инициализации: 0x%x\n", rc);
+        printf("Нажмите + для выхода\n");
+        
+        while (appletMainLoop() && !g_exitRequested) {
+            padUpdate(&pad);
+            u64 kDown = padGetButtonsDown(&pad);
+            if (kDown & HidNpadButton_Plus) break;
+            consoleUpdate(NULL);
+        }
+        return rc;
+    }
+    
+    // Создаем структуру папок
+    createDirectoryStructure();
     
     // Загружаем конфигурацию
     Config config;
-    rc = loadConfig(config);
+    loadConfig(config);
     
-    // Если первый запуск или конфиг не найден
-    if (R_FAILED(rc) || config.firstRun) {
-        rc = firstTimeSetup();
-        if (R_FAILED(rc)) {
-            printf("Ошибка первичной настройки: 0x%x\n", rc);
-            printf("Нажмите + для выхода.\n");
-            
-            while (appletMainLoop()) {
-                padUpdate(&pad);
-                u64 kDown = padGetButtonsDown(&pad);
-                if (kDown & HidNpadButton_Plus) break;
-                consoleUpdate(NULL);
-            }
-            
-            goto cleanup;
-        }
-        
-        // Перезагружаем конфигурацию
-        rc = loadConfig(config);
-        if (R_FAILED(rc)) {
-            printf("Ошибка загрузки конфигурации: 0x%x\n", rc);
-            goto cleanup;
-        }
+    // Инициализация GUI
+    g_gui = std::make_unique<NEOVIA_GUI>();
+    if (!g_gui->initialize(&config)) {
+        g_graphics->shutdown();
+        shutdownApp();
+        return -1;
     }
     
-    // Инициализация UI
-    rc = initializeUI();
-    if (R_FAILED(rc)) {
-        printf("Ошибка инициализации UI: 0x%x\n", rc);
-        goto cleanup;
-    }
+    // Устанавливаем обработчики событий
+    g_gui->setOnEnhanceClicked(onEnhanceButtonClicked);
+    g_gui->setOnSettingsClicked(onSettingsButtonClicked);
+    g_gui->setOnAboutClicked(onAboutButtonClicked);
     
-    // Основной цикл приложения
+    // Главный цикл с GUI
+    u64 lastTime = armGetSystemTick();
+    
     while (appletMainLoop() && !g_exitRequested) {
-        // Обновление UI
-        updateUI();
+        // Вычисляем delta time
+        u64 currentTime = armGetSystemTick();
+        float deltaTime = (float)(currentTime - lastTime) / armGetSystemTickFreq();
+        lastTime = currentTime;
         
-        // Обработка входных данных
+        // Обработка ввода
         padUpdate(&pad);
         u64 kDown = padGetButtonsDown(&pad);
         
+        // Глобальный выход
         if (kDown & HidNpadButton_Plus) {
             g_exitRequested = true;
+            break;
         }
         
-        // Обработка UI событий
-        handleUIInput(kDown);
+        // Передаем ввод в GUI
+        Point touchPos = {640, 360}; // Центр экрана по умолчанию
+        g_gui->handleInput(kDown, touchPos);
         
-        // Рендеринг
-        renderUI();
+        // Обновляем GUI
+        g_gui->update(deltaTime);
+        
+        // Рендерим GUI
+        g_gui->render();
     }
     
-cleanup:
-    // Очистка ресурсов
-    finalizeUI();
-    appletUnhook(&g_appletHookCookie);
-    finalizeApp();
-    consoleExit(NULL);
+    // Завершение работы
+    g_gui->shutdown();
+    g_graphics->shutdown();
+    shutdownApp();
     
     return 0;
 }
