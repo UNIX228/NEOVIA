@@ -13,42 +13,42 @@ SimpleInterface::~SimpleInterface() {
 }
 
 bool SimpleInterface::initialize() {
-    logToGraphics("Interface", "Инициализация графического интерфейса NEOVIA...");
+    logToGraphics("Interface", "Initializing NEOVIA graphics interface...");
     
     // Инициализация графики
     Result rc = gfxInitDefault();
     if (R_FAILED(rc)) {
-        logToGraphics("Interface", "Ошибка инициализации графики");
+        logToGraphics("Interface", "Failed to initialize graphics");
         return false;
     }
     
     gfxConfigureResolution(1280, 720);
     framebuffer = (uint32_t*)gfxGetFramebuffer(&width, &height);
     if (!framebuffer) {
-        logToGraphics("Interface", "Ошибка получения framebuffer");
+        logToGraphics("Interface", "Failed to get framebuffer");
         return false;
     }
     
-    logToGraphics("Interface", "Графика инициализирована: 1280x720");
+    logToGraphics("Interface", "Graphics initialized: 1280x720");
     
     // Инициализация NeoCore
     if (!g_neoCore.initialize()) {
-        logToGraphics("Interface", "NeoCore не инициализирован, продолжаем без него");
+        logToGraphics("Interface", "NeoCore not initialized, continuing without it");
     } else {
-        logToGraphics("Interface", "NeoCore успешно интегрирован");
+        logToGraphics("Interface", "NeoCore successfully integrated");
     }
     
     // Проверка иконки
     checkForIcon();
     
-    logToGraphics("Interface", "Интерфейс NEOVIA готов к работе");
+    logToGraphics("Interface", "NEOVIA interface ready for operation");
     return true;
 }
 
 void SimpleInterface::cleanup() {
-    logToGraphics("Interface", "Очистка графического интерфейса...");
+    logToGraphics("Interface", "Cleaning up graphics interface...");
     gfxExit();
-    logToGraphics("Interface", "Графический интерфейс завершен");
+    logToGraphics("Interface", "Graphics interface terminated");
 }
 
 void SimpleInterface::checkForIcon() {
@@ -57,9 +57,9 @@ void SimpleInterface::checkForIcon() {
     file.close();
     
     if (hasUserIcon) {
-        logToGraphics("Interface", "Пользовательская иконка найдена: icon.jpg");
+        logToGraphics("Interface", "User icon found: icon.jpg");
     } else {
-        logToGraphics("Interface", "Пользовательская иконка не найдена, используется стандартная");
+        logToGraphics("Interface", "User icon not found, using default");
     }
 }
 
@@ -208,11 +208,11 @@ bool SimpleInterface::handleInput(u64 kDown) {
 }
 
 void SimpleInterface::onEnhance() {
-    logToGraphics("Interface", "Пользователь нажал кнопку 'Улучшить'");
+    logToGraphics("Interface", "User pressed 'Enhance' button");
     
     // Запуск улучшения игр через NeoCore
     if (g_neoCore.isReady()) {
-        logToGraphics("Interface", "NeoCore готов, запуск улучшения графики...");
+        logToGraphics("Interface", "NeoCore ready, starting graphics enhancement...");
         
         // Создаем информацию об игре (пример)
         GameInfo gameInfo;
@@ -222,22 +222,22 @@ void SimpleInterface::onEnhance() {
         gameInfo.activeMods = {"shadows", "fxaa"};
         
         if (g_neoCore.startCore(gameInfo)) {
-            logToGraphics("Interface", "Улучшение графики запущено успешно");
+            logToGraphics("Interface", "Graphics enhancement started successfully");
         } else {
-            logToGraphics("Interface", "Ошибка запуска улучшения: " + g_neoCore.getLastError());
+            logToGraphics("Interface", "Enhancement start error: " + g_neoCore.getLastError());
         }
     } else {
-        logToGraphics("Interface", "NeoCore не готов, улучшение недоступно");
+        logToGraphics("Interface", "NeoCore not ready, enhancement unavailable");
     }
 }
 
 void SimpleInterface::onSettings() {
-    logToGraphics("Interface", "Переход в меню настроек");
+    logToGraphics("Interface", "Navigating to settings menu");
     currentScreen = Screen::SETTINGS;
 }
 
 void SimpleInterface::onAbout() {
-    logToGraphics("Interface", "Переход в меню 'О нас'");
+    logToGraphics("Interface", "Navigating to about menu");
     currentScreen = Screen::ABOUT;
 }
 

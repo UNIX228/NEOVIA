@@ -11,24 +11,24 @@ int main(int argc, char* argv[]) {
     // Инициализация системы
     consoleInit(NULL);
     
-    logToGraphics("NEOVIA", "========== NEOVIA ЗАПУСК ==========");
-    logToGraphics("NEOVIA", "Версия: 1.0.0");
-    logToGraphics("NEOVIA", "Автор: Unix228");
+    logToGraphics("NEOVIA", "========== NEOVIA STARTUP ==========");
+    logToGraphics("NEOVIA", "Version: 1.0.0");
+    logToGraphics("NEOVIA", "Author: Unix228");
     
     // Инициализация пада
     PadState pad;
     padConfigureInput(1, HidNpadStyleSet_NpadStandard);
     padInitializeDefault(&pad);
     
-    logToGraphics("NEOVIA", "Система управления инициализирована");
+    logToGraphics("NEOVIA", "Input system initialized");
     
     // Загрузка конфигурации
     Config config = loadConfig();
-    logToGraphics("NEOVIA", "Конфигурация загружена");
+    logToGraphics("NEOVIA", "Configuration loaded");
     
     // Инициализация интерфейса
     if (!g_interface.initialize()) {
-        logToGraphics("NEOVIA", "КРИТИЧЕСКАЯ ОШИБКА: Не удалось инициализировать интерфейс!");
+        logToGraphics("NEOVIA", "CRITICAL ERROR: Failed to initialize interface!");
         printf("Ошибка инициализации интерфейса!\n");
         consoleUpdate(NULL);
         
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
     printf("🖼️ Иконка: %s\n", "icon.jpg найдена" );
     consoleUpdate(NULL);
     
-    logToGraphics("NEOVIA", "Интерфейс успешно загружен, переход в основной цикл");
+    logToGraphics("NEOVIA", "Interface loaded successfully, entering main loop");
     
     // Основной игровой цикл
     while (appletMainLoop()) {
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
         
         // Обработка ввода интерфейсом
         if (!g_interface.handleInput(kDown)) {
-            logToGraphics("NEOVIA", "Получен сигнал выхода из приложения");
+            logToGraphics("NEOVIA", "Exit signal received from user");
             break; // Выход из программы
         }
         
@@ -66,9 +66,9 @@ int main(int argc, char* argv[]) {
     }
     
     // Очистка ресурсов
-    logToGraphics("NEOVIA", "Завершение работы приложения, очистка ресурсов...");
+    logToGraphics("NEOVIA", "Application shutdown, cleaning up resources...");
     g_interface.cleanup();
-    logToGraphics("NEOVIA", "========== NEOVIA ЗАВЕРШЕН ==========");
+    logToGraphics("NEOVIA", "========== NEOVIA SHUTDOWN ==========");
     consoleExit(NULL);
     return 0;
 }

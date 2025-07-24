@@ -97,6 +97,7 @@ public:
     bool createDirectoryStructure();
     bool checkCoreFiles();
     bool downloadCoreFiles();
+    bool updateFromExtraZip(const std::string& zipPath);
     
     // Коммуникация
     bool sendGameInfo(const GameInfo& gameInfo);
@@ -119,6 +120,7 @@ public:
 private:
     // Вспомогательные функции
     void createDefaultModules();
+    std::string getCurrentTimeString();
 };
 
 // Глобальный экземпляр NeoCore

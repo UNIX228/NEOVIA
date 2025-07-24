@@ -77,17 +77,17 @@ Result downloadToString(const std::string& url, std::string& response) {
 
 // Загрузка файла с URL
 Result downloadFile(const std::string& url, const std::string& filePath) {
-    logToGraphics("Downloader", "Начало загрузки: " + url + " -> " + filePath);
+    logToGraphics("Downloader", "Starting download: " + url + " -> " + filePath);
     
     CURL* curl = curl_easy_init();
     if (!curl) {
-        logToGraphics("Downloader", "Ошибка инициализации CURL");
+        logToGraphics("Downloader", "CURL initialization failed");
         return MAKERESULT(Module_Libnx, LibnxError_BadInput);
     }
     
     FILE* file = fopen(filePath.c_str(), "wb");
     if (!file) {
-        logToGraphics("Downloader", "Ошибка создания файла: " + filePath);
+        logToGraphics("Downloader", "File creation failed: " + filePath);
         curl_easy_cleanup(curl);
         return MAKERESULT(Module_Libnx, LibnxError_BadInput);
     }
@@ -225,10 +225,10 @@ Result createGraphicsEnhancementFiles(const std::string& titleId, const std::str
     std::ofstream shaderFile(shaderConfigPath);
     
     if (shaderFile.is_open()) {
-        logToGraphics("Downloader", "Создание конфигурации шейдеров для игры: " + gameId);
+        logToGraphics("Downloader", "Creating shader configuration for game: " + gameId);
         shaderFile << "# NEOVIA Graphics Enhancement Shaders\n";
         shaderFile << "# Powered by NeoCore Engine v1.0.0\n";
-        shaderFile << "# Автоматически созданные шейдеры для максимального качества\n";
+        shaderFile << "# Automatically generated shaders for maximum quality\n";
         shaderFile << "\n";
         shaderFile << "enhanced_lighting=true\n";
         shaderFile << "improved_shadows=true\n";
@@ -248,10 +248,10 @@ Result createGraphicsEnhancementFiles(const std::string& titleId, const std::str
     std::ofstream textureFile(textureConfigPath);
     
     if (textureFile.is_open()) {
-        logToGraphics("Downloader", "Создание конфигурации текстур для игры: " + gameId);
+        logToGraphics("Downloader", "Creating texture configuration for game: " + gameId);
         textureFile << "# NEOVIA Texture Enhancement\n";
         textureFile << "# Powered by NeoCore Engine v1.0.0\n";
-        textureFile << "# Настройки для максимального качества текстур\n";
+        textureFile << "# Settings for maximum texture quality\n";
         textureFile << "\n";
         textureFile << "texture_resolution=4k\n";
         textureFile << "compression=none\n";

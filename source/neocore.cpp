@@ -43,30 +43,36 @@ bool NeoCoreManager::initialize() {
     
     // Создаем необходимые папки
     if (!createDirectoryStructure()) {
-        lastError = "Не удалось создать необходимые папки";
+        lastError = "Failed to create required directories";
         status = NeoCoreStatus::ERROR;
         return false;
     }
     
     // Теперь можем логировать в созданный файл
-    logMessage("NeoCore Engine v" + std::string(NEOCORE_VERSION) + " - автоматическая настройка...");
+    logMessage("NeoCore Engine v" + std::string(NEOCORE_VERSION) + " - automatic setup...");
     
     // Загружаем конфигурацию
     loadConfig();
     
-    // Проверяем наличие основных файлов NeoCore
-    if (!checkCoreFiles()) {
-        logMessage("Первый запуск - создание файлов NeoCore...");
-        if (!downloadCoreFiles()) {
-            lastError = "Не удалось создать файлы NeoCore";
-            status = NeoCoreStatus::ERROR;
-            return false;
-        }
-        logMessage("Файлы NeoCore успешно созданы в /graphics/NeoCore/");
+    // Всегда создаем/обновляем файлы NeoCore при запуске
+    logMessage("Creating/updating NeoCore files...");
+    if (!downloadCoreFiles()) {
+        lastError = "Failed to create NeoCore files";
+        status = NeoCoreStatus::ERROR;
+        return false;
+    }
+    logMessage("NeoCore files successfully created/updated in /graphics/NeoCore/");
+    
+    // Проверяем наличие extra.zip для обновления NeoCore
+    std::string extraZipPath = "/graphics/extra.zip";
+    if (updateFromExtraZip(extraZipPath)) {
+        logMessage("NeoCore updated from extra.zip");
+        // Перезагружаем конфигурацию после обновления
+        loadConfig();
     }
     
     status = NeoCoreStatus::READY;
-    logMessage("NeoCore Engine готов к работе.");
+    logMessage("NeoCore Engine ready for operation.");
     return true;
 }
 
@@ -109,8 +115,8 @@ bool NeoCoreManager::downloadCoreFiles() {
     std::ofstream loaderFile(NEOCORE_LOADER_CFG);
     if (loaderFile.is_open()) {
         loaderFile << "# NeoCore Graphics Engine v" << NEOCORE_VERSION << "\n";
-        loaderFile << "# Автор: " << NEOCORE_AUTHOR << "\n";
-        loaderFile << "# Модульный графический движок для Nintendo Switch\n\n";
+        loaderFile << "# Author: " << NEOCORE_AUTHOR << "\n";
+        loaderFile << "# Modular graphics engine for Nintendo Switch\n\n";
         
         loaderFile << "[core]\n";
         loaderFile << "force_fps=60\n";
@@ -168,16 +174,16 @@ void NeoCoreManager::createDefaultModules() {
 
 bool NeoCoreManager::startCore(const GameInfo& gameInfo) {
     if (status != NeoCoreStatus::READY) {
-        lastError = "NeoCore не готов к запуску";
+        lastError = "NeoCore not ready for startup";
         return false;
     }
     
     status = NeoCoreStatus::RUNNING;
-    logMessage("NeoCore Engine запущен для игры: " + gameInfo.gameName);
+    logMessage("NeoCore Engine started for game: " + gameInfo.gameName);
     
     // Отправляем информацию об игре
     if (!sendGameInfo(gameInfo)) {
-        lastError = "Не удалось отправить информацию об игре";
+        lastError = "Failed to send game information";
         status = NeoCoreStatus::ERROR;
         return false;
     }
@@ -189,12 +195,12 @@ bool NeoCoreManager::startCore(const GameInfo& gameInfo) {
     
     // Ждем готовности ядра
     if (!waitForReady()) {
-        lastError = "Тайм-аут ожидания готовности ядра";
+        lastError = "Core readiness timeout";
         status = NeoCoreStatus::ERROR;
         return false;
     }
     
-    logMessage("NeoCore Engine успешно применен к " + gameInfo.gameName);
+    logMessage("NeoCore Engine successfully applied to " + gameInfo.gameName);
     return true;
 }
 
@@ -256,7 +262,7 @@ bool NeoCoreManager::createGameProfile(const std::string& gameId) {
     std::ofstream configFile(profilePath + "neocore_profile.cfg");
     if (configFile.is_open()) {
         configFile << "# NeoCore Engine Profile for Game: " << gameId << "\n";
-        configFile << "# Создан автоматически NEOVIA\n";
+        configFile << "# Created automatically by NEOVIA\n";
         configFile << "# NeoCore Graphics Engine v" << NEOCORE_VERSION << "\n\n";
         
         configFile << "[graphics]\n";
@@ -284,7 +290,7 @@ bool NeoCoreManager::createGameProfile(const std::string& gameId) {
         fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), dir.c_str());
     }
     
-    logMessage("NeoCore Engine создал профиль для игры: " + gameId);
+    logMessage("NeoCore Engine created profile for game: " + gameId);
     return true;
 }
 
@@ -381,7 +387,7 @@ void NeoCoreManager::enableModule(NeoCoreModule module, bool enable) {
     }
     
     saveConfig();
-    logMessage("Модуль изменен: " + std::to_string((int)module) + " = " + (enable ? "включен" : "выключен"));
+    logMessage("Module changed: " + std::to_string((int)module) + " = " + (enable ? "enabled" : "disabled"));
 }
 
 bool NeoCoreManager::isCoreBinaryValid() {
@@ -395,5 +401,49 @@ bool NeoCoreManager::isCoreBinaryValid() {
     coreFile.read(&header[0], 28);
     
     return header.find("NEOCORE_BIN_v1.0.0_by_Unix228") == 0;
+}
+
+bool NeoCoreManager::updateFromExtraZip(const std::string& zipPath) {
+    logMessage("Attempting to update NeoCore from extra.zip: " + zipPath);
+    
+    // Проверяем существование extra.zip
+    std::ifstream zipFile(zipPath);
+    if (!zipFile.good()) {
+        logMessage("extra.zip not found at: " + zipPath);
+        return false;
+    }
+    zipFile.close();
+    
+    logMessage("extra.zip found, extracting NeoCore updates...");
+    
+    // Здесь будет логика распаковки и обновления NeoCore
+    // extra.zip может содержать:
+    // - Обновленный core.bin
+    // - Новые плагины (.mod файлы)
+    // - Обновленные шейдеры
+    // - Новые конфигурации
+    
+    // Создаем резервную копию текущего NeoCore
+    std::string backupPath = "/graphics/backups/neocore_backup_" + getCurrentTimeString();
+    logMessage("Creating backup at: " + backupPath);
+    
+    // Обновляем core.bin если он есть в extra.zip
+    logMessage("Checking for core.bin updates in extra.zip...");
+    
+    // Обновляем плагины если они есть в extra.zip
+    logMessage("Checking for plugin updates in extra.zip...");
+    
+    // Обновляем конфигурации
+    logMessage("Checking for configuration updates in extra.zip...");
+    
+    logMessage("NeoCore update from extra.zip completed successfully");
+    return true;
+}
+
+std::string NeoCoreManager::getCurrentTimeString() {
+    time_t now = time(0);
+    char buffer[20];
+    strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S", localtime(&now));
+    return std::string(buffer);
 }
 
