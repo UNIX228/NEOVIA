@@ -30,13 +30,13 @@ void updateUI() {
 }
 
 void handleUIInput(u64 kDown) {
-    if (kDown & KEY_UP) {
+    if (kDown & HidNpadButton_Up) {
         g_selectedMenuItem = (g_selectedMenuItem - 1 + 6) % 6;
     }
-    if (kDown & KEY_DOWN) {
+    if (kDown & HidNpadButton_Down) {
         g_selectedMenuItem = (g_selectedMenuItem + 1) % 6;
     }
-    if (kDown & KEY_B) {
+    if (kDown & HidNpadButton_B) {
         g_exitRequested = true;
     }
 }
