@@ -66,14 +66,15 @@ void SimpleInterface::render() {
 }
 
 void SimpleInterface::renderMainScreen() {
-    // Три полоски в левом верхнем углу
-    drawText("☰", 50, 50, Colors::BLACK, 24);
+    // Три полоски в левом верхнем углу (выделяемые)
+    Color menuColor = (selectedItem == 1) ? Colors::BLUE_ACCENT : Colors::BLACK;
+    drawText("☰", 50, 50, menuColor, 24);
     
     // Название по центру
     drawText("NEOVIA", 540, 200, Colors::BLACK, 48);
     
     // Кнопка "Улучшить" по центру
-    drawButton("Улучшить", 540, 350, 200, 60, true);
+    drawButton("Улучшить", 540, 350, 200, 60, selectedItem == 0);
 }
 
 void SimpleInterface::renderMenu() {
