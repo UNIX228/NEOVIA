@@ -1,0 +1,38 @@
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore
++++ b/.gitignore
+@@ -0,0 +1,34 @@
++# Build artifacts
++build/
++*.nro
++*.nacp
++*.elf
++*.o
++*.d
++
++# Release folder
++release/
++
++# IDE files
++.vscode/
++.idea/
++*.swp
++*.swo
++*~
++
++# OS generated files
++.DS_Store
++.DS_Store?
++._*
++.Spotlight-V100
++.Trashes
++ehthumbs.db
++Thumbs.db
++
++# Temporary files
++*.tmp
++*.temp
++*.log
++
++# devkitPro specific
++*.map
