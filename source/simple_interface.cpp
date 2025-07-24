@@ -120,11 +120,17 @@ bool SimpleInterface::handleInput(u64 kDown) {
     
     switch (currentScreen) {
         case Screen::MAIN:
-            if (kDown & HidNpadButton_A) {
-                onEnhance(); // Улучшить
-            } else if (kDown & HidNpadButton_X) {
-                currentScreen = Screen::MENU; // Открыть меню (три полоски)
-                selectedItem = 0;
+            if (kDown & HidNpadButton_Up) {
+                selectedItem = (selectedItem - 1 + 2) % 2;
+            } else if (kDown & HidNpadButton_Down) {
+                selectedItem = (selectedItem + 1) % 2;
+            } else if (kDown & HidNpadButton_A) {
+                if (selectedItem == 0) {
+                    onEnhance(); // Улучшить
+                } else {
+                    currentScreen = Screen::MENU; // Три полоски
+                    selectedItem = 0;
+                }
             }
             break;
             
