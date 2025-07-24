@@ -119,8 +119,6 @@ public:
 private:
     // Вспомогательные функции
     void createDefaultModules();
-    void createInfoFile();
-    std::string getCurrentTime();
 };
 
 // Глобальный экземпляр NeoCore

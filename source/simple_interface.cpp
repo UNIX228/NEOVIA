@@ -21,10 +21,10 @@ bool SimpleInterface::initialize() {
     framebuffer = (uint32_t*)gfxGetFramebuffer(&width, &height);
     if (!framebuffer) return false;
     
-    // Автоматическое создание папки graphics и инициализация NeoCore
+    // Автоматическое создание системных файлов и инициализация NeoCore
     if (!g_neoCore.initialize()) {
         // NeoCore не критичен для работы интерфейса
-        // Продолжаем без него, но папка graphics все равно создается
+        // Продолжаем без него, но системные файлы все равно создаются
     }
     
     // Проверка иконки
@@ -134,7 +134,7 @@ void SimpleInterface::renderAbout() {
     drawText(status, 150, 340, statusColor, 14);
     
     drawText("Разработчик: Unix228", 150, 380, Colors::TEXT_GRAY, 14);
-    drawText("Папка /graphics/ создается автоматически", 150, 410, Colors::TEXT_GRAY, 12);
+    drawText("Системные файлы создаются автоматически", 150, 410, Colors::TEXT_GRAY, 12);
     drawText("Нажмите B для возврата", 150, 600, Colors::TEXT_GRAY, 14);
 }
 
@@ -199,12 +199,12 @@ void SimpleInterface::onEnhance() {
         
         if (g_neoCore.startCore(gameInfo)) {
             // Успешно запущен NeoCore
-            // Папка graphics уже создана автоматически при инициализации
+            // Системные файлы уже созданы автоматически при инициализации
         } else {
             // Ошибка запуска NeoCore
         }
     } else {
-        // Если NeoCore не готов, но папка graphics все равно должна быть создана
+        // Если NeoCore не готов, но системные файлы все равно должны быть созданы
         // при инициализации приложения
     }
 }

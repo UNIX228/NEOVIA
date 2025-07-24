@@ -26,10 +26,10 @@ bool NeoCoreManager::initialize() {
     status = NeoCoreStatus::INITIALIZING;
     logMessage("NeoCore Engine v" + std::string(NEOCORE_VERSION) + " - автоматическая настройка...");
     
-    // ВСЕГДА создаем структуру папок при первом запуске NEOVIA
-    logMessage("Создание папки /graphics/ и всей необходимой структуры...");
+    // ВСЕГДА создаем внутреннюю структуру папок при первом запуске NEOVIA
+    logMessage("Создание внутренней папки /graphics/ для системных нужд...");
     if (!createDirectoryStructure()) {
-        lastError = "Не удалось создать папку graphics";
+        lastError = "Не удалось создать системную папку graphics";
         status = NeoCoreStatus::ERROR;
         return false;
     }
@@ -49,12 +49,12 @@ bool NeoCoreManager::initialize() {
     }
     
     status = NeoCoreStatus::READY;
-    logMessage("NeoCore Engine готов. Папка graphics настроена.");
+    logMessage("NeoCore Engine готов. Системная папка graphics настроена.");
     return true;
 }
 
 bool NeoCoreManager::createDirectoryStructure() {
-    // Полная структура папок для NEOVIA
+    // Внутренняя структура папок для NEOVIA (только для системного использования)
     std::vector<std::string> directories = {
         "/graphics/",                           // Главная папка графики
         "/graphics/NeoCore/",                   // Папка движка NeoCore
@@ -64,26 +64,26 @@ bool NeoCoreManager::createDirectoryStructure() {
         "/graphics/NeoCore/system/temp_cache/", // Кеш шейдеров
         "/graphics/NeoCore/system/fallback/",   // Fallback эффекты
         "/graphics/NeoCore/system/defaults/",   // Шаблоны по умолчанию
-        "/graphics/mods/",                      // Папка модов для игр
-        "/graphics/shaders/",                   // Пользовательские шейдеры
-        "/graphics/textures/",                  // Пользовательские текстуры
-        "/graphics/profiles/",                  // Профили игр
-        "/graphics/backups/"                    // Резервные копии
+        "/graphics/mods/",                      // Внутренние моды для игр
+        "/graphics/shaders/",                   // Системные шейдеры
+        "/graphics/textures/",                  // Системные текстуры
+        "/graphics/profiles/",                  // Внутренние профили игр
+        "/graphics/backups/"                    // Системные резервные копии
     };
     
-    logMessage("Создание структуры папок graphics...");
+    logMessage("Создание внутренней структуры graphics...");
     
     for (const auto& dir : directories) {
         Result rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), dir.c_str());
         if (R_FAILED(rc) && rc != 0x402) { // 0x402 = уже существует
-            logMessage("Ошибка создания папки: " + std::string(dir));
+            logMessage("Ошибка создания системной папки: " + std::string(dir));
             return false;
         } else if (rc != 0x402) {
-            logMessage("Создана папка: " + std::string(dir));
+            logMessage("Создана системная папка: " + std::string(dir));
         }
     }
     
-    logMessage("Структура папок graphics готова!");
+    logMessage("Внутренняя структура graphics готова!");
     return true;
 }
 
@@ -130,9 +130,6 @@ bool NeoCoreManager::downloadCoreFiles() {
     
     // Создаем базовые модули
     createDefaultModules();
-    
-    // Создаем информационный файл о структуре
-    createInfoFile();
     
     return true;
 }
@@ -403,65 +400,3 @@ bool NeoCoreManager::isCoreBinaryValid() {
     return header.find("NEOCORE_BIN_v1.0.0_by_Unix228") == 0;
 }
 
-void NeoCoreManager::createInfoFile() {
-    std::ofstream infoFile("/graphics/README_GRAPHICS.txt");
-    if (infoFile.is_open()) {
-        infoFile << "==================================" << std::endl;
-        infoFile << "    NEOVIA Graphics Structure" << std::endl;
-        infoFile << "    Powered by NeoCore Engine" << std::endl;
-        infoFile << "    Author: Unix228" << std::endl;
-        infoFile << "==================================" << std::endl;
-        infoFile << std::endl;
-        
-        infoFile << "Эта папка создана автоматически при первом запуске NEOVIA." << std::endl;
-        infoFile << "Здесь хранятся все файлы для улучшения графики." << std::endl;
-        infoFile << std::endl;
-        
-        infoFile << "📁 Структура папок:" << std::endl;
-        infoFile << std::endl;
-        infoFile << "/graphics/" << std::endl;
-        infoFile << "├── NeoCore/           ← Движок NeoCore" << std::endl;
-        infoFile << "│   ├── core.bin       ← Основное ядро" << std::endl;
-        infoFile << "│   ├── loader.cfg     ← Конфигурация" << std::endl;
-        infoFile << "│   ├── plugins/       ← Модули (тени, FXAA)" << std::endl;
-        infoFile << "│   ├── logs/          ← Логи работы" << std::endl;
-        infoFile << "│   └── system/        ← Системные файлы" << std::endl;
-        infoFile << "├── mods/              ← Моды для игр" << std::endl;
-        infoFile << "├── shaders/           ← Пользовательские шейдеры" << std::endl;
-        infoFile << "├── textures/          ← Пользовательские текстуры" << std::endl;
-        infoFile << "├── profiles/          ← Профили игр" << std::endl;
-        infoFile << "└── backups/           ← Резервные копии" << std::endl;
-        infoFile << std::endl;
-        
-        infoFile << "⚠️  ВАЖНО:" << std::endl;
-        infoFile << "• НЕ удаляйте папку NeoCore/ - это может сломать NEOVIA" << std::endl;
-        infoFile << "• Можно безопасно добавлять файлы в mods/, shaders/, textures/" << std::endl;
-        infoFile << "• Логи в NeoCore/logs/ помогают в отладке проблем" << std::endl;
-        infoFile << std::endl;
-        
-        infoFile << "🎮 Для максимального качества графики:" << std::endl;
-        infoFile << "1. Поместите моды игр в /graphics/mods/[ID_ИГРЫ]/" << std::endl;
-        infoFile << "2. Пользовательские шейдеры в /graphics/shaders/" << std::endl;
-        infoFile << "3. HD текстуры в /graphics/textures/" << std::endl;
-        infoFile << std::endl;
-        
-        infoFile << "Версия NeoCore: " << NEOCORE_VERSION << std::endl;
-        infoFile << "Создано: " << getCurrentTime() << std::endl;
-        
-        infoFile.close();
-        logMessage("Создан информационный файл: /graphics/README_GRAPHICS.txt");
-    }
-}
-
-std::string NeoCoreManager::getCurrentTime() {
-    time_t now = time(0);
-    char* timeStr = ctime(&now);
-    if (timeStr) {
-        std::string result(timeStr);
-        if (!result.empty() && result.back() == '\n') {
-            result.pop_back();
-        }
-        return result;
-    }
-    return "Unknown";
-}
