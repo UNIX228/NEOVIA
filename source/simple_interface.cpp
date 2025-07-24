@@ -89,7 +89,6 @@ void SimpleInterface::renderMenu() {
     }
     
     drawText("NEOVIA", 230, 170, Colors::BLACK, 32);
-    drawText("Graphics Enhancement System", 230, 200, Colors::TEXT_GRAY, 16);
     
     // Линия под логотипом
     drawRect(150, 240, 300, 2, Colors::TEXT_GRAY);
