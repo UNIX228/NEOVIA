@@ -61,13 +61,7 @@ struct NeoCoreConfig {
     std::string quality_preset; // ultra, high, medium, low
 };
 
-// Информация об игре для NeoCore
-struct GameInfo {
-    std::string gameId;
-    std::string gameName;
-    std::vector<std::string> activeMods;
-    bool hasCustomProfile;
-};
+// GameInfo уже определена в neovia.h, используем её
 
 // Класс управления NeoCore
 class NeoCoreManager {

@@ -125,13 +125,16 @@ namespace AdvancedEffects {
         }
     }
     
+    // Simple star struct for constellation
+    struct Star {
+        float x, y;
+        float brightness;
+        float phase;
+    };
+
     // Animated constellation effect
     void drawConstellation(float x, float y, float width, float height, float time, int starCount = 20) {
-        static std::vector<struct Star {
-            float x, y;
-            float brightness;
-            float phase;
-        }> stars;
+        static std::vector<Star> stars;
         
         // Initialize stars
         if (stars.empty() || stars.size() != starCount) {

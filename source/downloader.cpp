@@ -18,27 +18,7 @@ struct DownloadData {
     FILE* file;
 };
 
-// Callback для записи данных в строку
-static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, DownloadData* data) {
-    size_t realsize = size * nmemb;
-    data->data.append((char*)contents, realsize);
-    return realsize;
-}
-
-// Callback для записи данных в файл
-static size_t WriteFileCallback(void* contents, size_t size, size_t nmemb, DownloadData* data) {
-    return fwrite(contents, size, nmemb, data->file);
-}
-
-// Callback для отслеживания прогресса загрузки
-static int ProgressCallback(void* clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
-    if (dltotal > 0) {
-        g_downloadProgress.totalBytes = dltotal;
-        g_downloadProgress.currentBytes = dlnow;
-        g_downloadProgress.percentage = (int)((dlnow * 100) / dltotal);
-    }
-    return 0;
-}
+// CURL callback functions removed - not needed without CURL
 
 // Загрузка данных с URL в строку (заглушка - CURL может отсутствовать)
 Result downloadToString(const std::string& url, std::string& response) {
@@ -172,11 +152,11 @@ Result createGraphicsEnhancementFiles(const std::string& titleId, const std::str
     std::string shaderPath = "/graphics/shaders/";
     fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), shaderPath.c_str());
     
-    std::string shaderConfigPath = shaderPath + gameId + "_shader_config.txt";
+    std::string shaderConfigPath = shaderPath + titleId + "_shader_config.txt";
     std::ofstream shaderFile(shaderConfigPath);
     
     if (shaderFile.is_open()) {
-        logToGraphics("Downloader", "Creating shader configuration for game: " + gameId);
+        logToGraphics("Downloader", "Creating shader configuration for game: " + titleId);
         shaderFile << "# NEOVIA Graphics Enhancement Shaders\n";
         shaderFile << "# Powered by NeoCore Engine v1.0.0\n";
         shaderFile << "# Automatically generated shaders for maximum quality\n";
@@ -195,11 +175,11 @@ Result createGraphicsEnhancementFiles(const std::string& titleId, const std::str
     std::string texturePath = "/graphics/textures/";
     fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), texturePath.c_str());
     
-    std::string textureConfigPath = texturePath + gameId + "_texture_config.txt";
+    std::string textureConfigPath = texturePath + titleId + "_texture_config.txt";
     std::ofstream textureFile(textureConfigPath);
     
     if (textureFile.is_open()) {
-        logToGraphics("Downloader", "Creating texture configuration for game: " + gameId);
+        logToGraphics("Downloader", "Creating texture configuration for game: " + titleId);
         textureFile << "# NEOVIA Texture Enhancement\n";
         textureFile << "# Powered by NeoCore Engine v1.0.0\n";
         textureFile << "# Settings for maximum texture quality\n";
