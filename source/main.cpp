@@ -33,16 +33,19 @@ void finalizeApp() {
 Result createDirectoryStructure() {
     Result rc = 0;
     
-    rc = fsMkdir(fsdevGetDeviceFileSystem("sdmc"), "/graphics");
+    FsFileSystem* fs = fsdevGetDeviceFileSystem("sdmc");
+    if (!fs) return MAKERESULT(Module_Libnx, LibnxError_BadInput);
+    
+    rc = fsFsCreateDirectory(fs, "/graphics");
     if (R_FAILED(rc) && rc != 0x402) {
         printf("Failed to create /graphics directory: 0x%x\n", rc);
         return rc;
     }
     
-    rc = fsMkdir(fsdevGetDeviceFileSystem("sdmc"), "/switch");
+    rc = fsFsCreateDirectory(fs, "/switch");
     if (R_FAILED(rc) && rc != 0x402) return rc;
     
-    rc = fsMkdir(fsdevGetDeviceFileSystem("sdmc"), "/switch/NEOVIA");
+    rc = fsFsCreateDirectory(fs, "/switch/NEOVIA");
     if (R_FAILED(rc) && rc != 0x402) return rc;
     
     return 0;
@@ -59,7 +62,7 @@ int main(int argc, char* argv[]) {
         while (appletMainLoop()) {
             hidScanInput();
             u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
-            if (kDown & KEY_PLUS) break;
+            if (kDown & HidNpadButton_Plus) break;
             consoleUpdate(NULL);
         }
         
@@ -84,7 +87,7 @@ int main(int argc, char* argv[]) {
         hidScanInput();
         u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
         
-        if (kDown & KEY_PLUS) {
+        if (kDown & HidNpadButton_Plus) {
             g_exitRequested = true;
         }
         
