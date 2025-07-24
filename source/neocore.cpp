@@ -26,10 +26,9 @@ bool NeoCoreManager::initialize() {
     status = NeoCoreStatus::INITIALIZING;
     logMessage("NeoCore Engine v" + std::string(NEOCORE_VERSION) + " - автоматическая настройка...");
     
-    // ВСЕГДА создаем внутреннюю структуру папок при первом запуске NEOVIA
-    logMessage("Создание внутренней папки /graphics/ для системных нужд...");
+    // Создаем необходимые папки
     if (!createDirectoryStructure()) {
-        lastError = "Не удалось создать системную папку graphics";
+        lastError = "Не удалось создать необходимые папки";
         status = NeoCoreStatus::ERROR;
         return false;
     }
@@ -49,41 +48,34 @@ bool NeoCoreManager::initialize() {
     }
     
     status = NeoCoreStatus::READY;
-    logMessage("NeoCore Engine готов. Системная папка graphics настроена.");
+    logMessage("NeoCore Engine готов к работе.");
     return true;
 }
 
 bool NeoCoreManager::createDirectoryStructure() {
-    // Внутренняя структура папок для NEOVIA (только для системного использования)
     std::vector<std::string> directories = {
-        "/graphics/",                           // Главная папка графики
-        "/graphics/NeoCore/",                   // Папка движка NeoCore
-        "/graphics/NeoCore/plugins/",           // Плагины и модули
-        "/graphics/NeoCore/logs/",              // Логи движка
-        "/graphics/NeoCore/system/",            // Системные файлы
-        "/graphics/NeoCore/system/temp_cache/", // Кеш шейдеров
-        "/graphics/NeoCore/system/fallback/",   // Fallback эффекты
-        "/graphics/NeoCore/system/defaults/",   // Шаблоны по умолчанию
-        "/graphics/mods/",                      // Внутренние моды для игр
-        "/graphics/shaders/",                   // Системные шейдеры
-        "/graphics/textures/",                  // Системные текстуры
-        "/graphics/profiles/",                  // Внутренние профили игр
-        "/graphics/backups/"                    // Системные резервные копии
+        "/graphics/",                           
+        "/graphics/NeoCore/",                   
+        "/graphics/NeoCore/plugins/",           
+        "/graphics/NeoCore/logs/",              
+        "/graphics/NeoCore/system/",            
+        "/graphics/NeoCore/system/temp_cache/", 
+        "/graphics/NeoCore/system/fallback/",   
+        "/graphics/NeoCore/system/defaults/",   
+        "/graphics/mods/",                      
+        "/graphics/shaders/",                   
+        "/graphics/textures/",                  
+        "/graphics/profiles/",                  
+        "/graphics/backups/"                    
     };
-    
-    logMessage("Создание внутренней структуры graphics...");
     
     for (const auto& dir : directories) {
         Result rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), dir.c_str());
         if (R_FAILED(rc) && rc != 0x402) { // 0x402 = уже существует
-            logMessage("Ошибка создания системной папки: " + std::string(dir));
             return false;
-        } else if (rc != 0x402) {
-            logMessage("Создана системная папка: " + std::string(dir));
         }
     }
     
-    logMessage("Внутренняя структура graphics готова!");
     return true;
 }
 
@@ -100,8 +92,7 @@ bool NeoCoreManager::downloadCoreFiles() {
     if (loaderFile.is_open()) {
         loaderFile << "# NeoCore Graphics Engine v" << NEOCORE_VERSION << "\n";
         loaderFile << "# Автор: " << NEOCORE_AUTHOR << "\n";
-        loaderFile << "# Модульный графический движок для Nintendo Switch\n";
-        loaderFile << "# Интегрирован в NEOVIA - папка graphics создается автоматически\n\n";
+        loaderFile << "# Модульный графический движок для Nintendo Switch\n\n";
         
         loaderFile << "[core]\n";
         loaderFile << "force_fps=60\n";
@@ -247,9 +238,8 @@ bool NeoCoreManager::createGameProfile(const std::string& gameId) {
     std::ofstream configFile(profilePath + "neocore_profile.cfg");
     if (configFile.is_open()) {
         configFile << "# NeoCore Engine Profile for Game: " << gameId << "\n";
-        configFile << "# Создан автоматически NEOVIA при первом запуске\n";
-        configFile << "# NeoCore Graphics Engine v" << NEOCORE_VERSION << "\n";
-        configFile << "# Папка graphics создается автоматически\n\n";
+        configFile << "# Создан автоматически NEOVIA\n";
+        configFile << "# NeoCore Graphics Engine v" << NEOCORE_VERSION << "\n\n";
         
         configFile << "[graphics]\n";
         configFile << "shadows=true\n";
