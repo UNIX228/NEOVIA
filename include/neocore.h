@@ -115,6 +115,12 @@ public:
     // Информация
     std::string getVersion() const { return NEOCORE_VERSION; }
     std::string getAuthor() const { return NEOCORE_AUTHOR; }
+    
+private:
+    // Вспомогательные функции
+    void createDefaultModules();
+    void createInfoFile();
+    std::string getCurrentTime();
 };
 
 // Глобальный экземпляр NeoCore

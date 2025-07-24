@@ -24,11 +24,12 @@ NeoCoreManager::~NeoCoreManager() {
 
 bool NeoCoreManager::initialize() {
     status = NeoCoreStatus::INITIALIZING;
-    logMessage("NeoCore Engine v" + std::string(NEOCORE_VERSION) + " инициализация...");
+    logMessage("NeoCore Engine v" + std::string(NEOCORE_VERSION) + " - автоматическая настройка...");
     
-    // Создаем структуру папок
+    // ВСЕГДА создаем структуру папок при первом запуске NEOVIA
+    logMessage("Создание папки /graphics/ и всей необходимой структуры...");
     if (!createDirectoryStructure()) {
-        lastError = "Не удалось создать структуру папок NeoCore";
+        lastError = "Не удалось создать папку graphics";
         status = NeoCoreStatus::ERROR;
         return false;
     }
@@ -36,42 +37,53 @@ bool NeoCoreManager::initialize() {
     // Загружаем конфигурацию
     loadConfig();
     
-    // Проверяем наличие основных файлов
+    // Проверяем наличие основных файлов NeoCore
     if (!checkCoreFiles()) {
-        logMessage("Основные файлы NeoCore отсутствуют, попытка загрузки...");
+        logMessage("Первый запуск - создание файлов NeoCore...");
         if (!downloadCoreFiles()) {
-            lastError = "Не удалось загрузить файлы NeoCore";
+            lastError = "Не удалось создать файлы NeoCore";
             status = NeoCoreStatus::ERROR;
             return false;
         }
+        logMessage("Файлы NeoCore успешно созданы в /graphics/NeoCore/");
     }
     
     status = NeoCoreStatus::READY;
-    logMessage("NeoCore Engine инициализирован и готов к работе");
+    logMessage("NeoCore Engine готов. Папка graphics настроена.");
     return true;
 }
 
 bool NeoCoreManager::createDirectoryStructure() {
+    // Полная структура папок для NEOVIA
     std::vector<std::string> directories = {
-        "/graphics/",
-        NEOCORE_PATH,
-        NEOCORE_PLUGINS_PATH,
-        NEOCORE_LOGS_PATH,
-        NEOCORE_SYSTEM_PATH,
-        NEOCORE_TEMP_CACHE,
-        NEOCORE_FALLBACK,
-        "/graphics/NeoCore/system/defaults/",
-        "/graphics/mods/"
+        "/graphics/",                           // Главная папка графики
+        "/graphics/NeoCore/",                   // Папка движка NeoCore
+        "/graphics/NeoCore/plugins/",           // Плагины и модули
+        "/graphics/NeoCore/logs/",              // Логи движка
+        "/graphics/NeoCore/system/",            // Системные файлы
+        "/graphics/NeoCore/system/temp_cache/", // Кеш шейдеров
+        "/graphics/NeoCore/system/fallback/",   // Fallback эффекты
+        "/graphics/NeoCore/system/defaults/",   // Шаблоны по умолчанию
+        "/graphics/mods/",                      // Папка модов для игр
+        "/graphics/shaders/",                   // Пользовательские шейдеры
+        "/graphics/textures/",                  // Пользовательские текстуры
+        "/graphics/profiles/",                  // Профили игр
+        "/graphics/backups/"                    // Резервные копии
     };
+    
+    logMessage("Создание структуры папок graphics...");
     
     for (const auto& dir : directories) {
         Result rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), dir.c_str());
         if (R_FAILED(rc) && rc != 0x402) { // 0x402 = уже существует
             logMessage("Ошибка создания папки: " + std::string(dir));
             return false;
+        } else if (rc != 0x402) {
+            logMessage("Создана папка: " + std::string(dir));
         }
     }
     
+    logMessage("Структура папок graphics готова!");
     return true;
 }
 
@@ -89,7 +101,7 @@ bool NeoCoreManager::downloadCoreFiles() {
         loaderFile << "# NeoCore Graphics Engine v" << NEOCORE_VERSION << "\n";
         loaderFile << "# Автор: " << NEOCORE_AUTHOR << "\n";
         loaderFile << "# Модульный графический движок для Nintendo Switch\n";
-        loaderFile << "# Независимый проект - github.com/unix228/neocore\n\n";
+        loaderFile << "# Интегрирован в NEOVIA - папка graphics создается автоматически\n\n";
         
         loaderFile << "[core]\n";
         loaderFile << "force_fps=60\n";
@@ -118,6 +130,9 @@ bool NeoCoreManager::downloadCoreFiles() {
     
     // Создаем базовые модули
     createDefaultModules();
+    
+    // Создаем информационный файл о структуре
+    createInfoFile();
     
     return true;
 }
@@ -235,9 +250,9 @@ bool NeoCoreManager::createGameProfile(const std::string& gameId) {
     std::ofstream configFile(profilePath + "neocore_profile.cfg");
     if (configFile.is_open()) {
         configFile << "# NeoCore Engine Profile for Game: " << gameId << "\n";
-        configFile << "# Создан автоматически через NEOVIA\n";
+        configFile << "# Создан автоматически NEOVIA при первом запуске\n";
         configFile << "# NeoCore Graphics Engine v" << NEOCORE_VERSION << "\n";
-        configFile << "# github.com/unix228/neocore\n\n";
+        configFile << "# Папка graphics создается автоматически\n\n";
         
         configFile << "[graphics]\n";
         configFile << "shadows=true\n";
@@ -386,4 +401,67 @@ bool NeoCoreManager::isCoreBinaryValid() {
     coreFile.read(&header[0], 28);
     
     return header.find("NEOCORE_BIN_v1.0.0_by_Unix228") == 0;
+}
+
+void NeoCoreManager::createInfoFile() {
+    std::ofstream infoFile("/graphics/README_GRAPHICS.txt");
+    if (infoFile.is_open()) {
+        infoFile << "==================================" << std::endl;
+        infoFile << "    NEOVIA Graphics Structure" << std::endl;
+        infoFile << "    Powered by NeoCore Engine" << std::endl;
+        infoFile << "    Author: Unix228" << std::endl;
+        infoFile << "==================================" << std::endl;
+        infoFile << std::endl;
+        
+        infoFile << "Эта папка создана автоматически при первом запуске NEOVIA." << std::endl;
+        infoFile << "Здесь хранятся все файлы для улучшения графики." << std::endl;
+        infoFile << std::endl;
+        
+        infoFile << "📁 Структура папок:" << std::endl;
+        infoFile << std::endl;
+        infoFile << "/graphics/" << std::endl;
+        infoFile << "├── NeoCore/           ← Движок NeoCore" << std::endl;
+        infoFile << "│   ├── core.bin       ← Основное ядро" << std::endl;
+        infoFile << "│   ├── loader.cfg     ← Конфигурация" << std::endl;
+        infoFile << "│   ├── plugins/       ← Модули (тени, FXAA)" << std::endl;
+        infoFile << "│   ├── logs/          ← Логи работы" << std::endl;
+        infoFile << "│   └── system/        ← Системные файлы" << std::endl;
+        infoFile << "├── mods/              ← Моды для игр" << std::endl;
+        infoFile << "├── shaders/           ← Пользовательские шейдеры" << std::endl;
+        infoFile << "├── textures/          ← Пользовательские текстуры" << std::endl;
+        infoFile << "├── profiles/          ← Профили игр" << std::endl;
+        infoFile << "└── backups/           ← Резервные копии" << std::endl;
+        infoFile << std::endl;
+        
+        infoFile << "⚠️  ВАЖНО:" << std::endl;
+        infoFile << "• НЕ удаляйте папку NeoCore/ - это может сломать NEOVIA" << std::endl;
+        infoFile << "• Можно безопасно добавлять файлы в mods/, shaders/, textures/" << std::endl;
+        infoFile << "• Логи в NeoCore/logs/ помогают в отладке проблем" << std::endl;
+        infoFile << std::endl;
+        
+        infoFile << "🎮 Для максимального качества графики:" << std::endl;
+        infoFile << "1. Поместите моды игр в /graphics/mods/[ID_ИГРЫ]/" << std::endl;
+        infoFile << "2. Пользовательские шейдеры в /graphics/shaders/" << std::endl;
+        infoFile << "3. HD текстуры в /graphics/textures/" << std::endl;
+        infoFile << std::endl;
+        
+        infoFile << "Версия NeoCore: " << NEOCORE_VERSION << std::endl;
+        infoFile << "Создано: " << getCurrentTime() << std::endl;
+        
+        infoFile.close();
+        logMessage("Создан информационный файл: /graphics/README_GRAPHICS.txt");
+    }
+}
+
+std::string NeoCoreManager::getCurrentTime() {
+    time_t now = time(0);
+    char* timeStr = ctime(&now);
+    if (timeStr) {
+        std::string result(timeStr);
+        if (!result.empty() && result.back() == '\n') {
+            result.pop_back();
+        }
+        return result;
+    }
+    return "Unknown";
 }
