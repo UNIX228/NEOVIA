@@ -149,14 +149,14 @@ Result downloadModsForGame(const std::string& titleId) {
     
     // Создаем папку для игры
     std::string gamePath = std::string(GRAPHICS_PATH) + titleId + "/";
-    rc = fsMkdir(fsdevGetDeviceFileSystem("sdmc"), gamePath.c_str());
+    rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), gamePath.c_str());
     if (R_FAILED(rc) && rc != 0x402) { // 0x402 = уже существует
         return rc;
     }
     
     // Создаем папку downloaded
     std::string downloadPath = gamePath + "downloaded/";
-    rc = fsMkdir(fsdevGetDeviceFileSystem("sdmc"), downloadPath.c_str());
+    rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), downloadPath.c_str());
     if (R_FAILED(rc) && rc != 0x402) {
         return rc;
     }
@@ -214,7 +214,7 @@ Result createGraphicsEnhancementFiles(const std::string& titleId, const std::str
     
     // Создаем файл шейдеров
     std::string shaderPath = gamePath + "shaders/";
-    fsMkdir(fsdevGetDeviceFileSystem("sdmc"), shaderPath.c_str());
+    fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), shaderPath.c_str());
     
     std::string shaderConfigPath = shaderPath + "shader_config.txt";
     std::ofstream shaderFile(shaderConfigPath);
@@ -235,7 +235,7 @@ Result createGraphicsEnhancementFiles(const std::string& titleId, const std::str
     
     // Создаем файл текстур
     std::string texturePath = gamePath + "textures/";
-    fsMkdir(fsdevGetDeviceFileSystem("sdmc"), texturePath.c_str());
+    fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), texturePath.c_str());
     
     std::string textureConfigPath = texturePath + "texture_config.txt";
     std::ofstream textureFile(textureConfigPath);

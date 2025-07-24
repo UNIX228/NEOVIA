@@ -80,26 +80,26 @@ Result createDirectoryStructure() {
     Result rc = 0;
     
     // Создаем основную папку graphics
-    rc = fsMkdir(fsdevGetDeviceFileSystem("sdmc"), "/graphics");
+    rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), "/graphics");
     if (R_FAILED(rc) && rc != 0x402) { // 0x402 = уже существует
         printf("Failed to create /graphics directory: 0x%x\n", rc);
         return rc;
     }
     
     // Создаем папку для NEOVIA
-    rc = fsMkdir(fsdevGetDeviceFileSystem("sdmc"), "/switch");
+    rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), "/switch");
     if (R_FAILED(rc) && rc != 0x402) {
         printf("Failed to create /switch directory: 0x%x\n", rc);
         return rc;
     }
     
-    rc = fsMkdir(fsdevGetDeviceFileSystem("sdmc"), "/switch/NEOVIA");
+    rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), "/switch/NEOVIA");
     if (R_FAILED(rc) && rc != 0x402) {
         printf("Failed to create /switch/NEOVIA directory: 0x%x\n", rc);
         return rc;
     }
     
-    rc = fsMkdir(fsdevGetDeviceFileSystem("sdmc"), "/switch/NEOVIA/extras");
+    rc = fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), "/switch/NEOVIA/extras");
     if (R_FAILED(rc) && rc != 0x402) {
         printf("Failed to create /switch/NEOVIA/extras directory: 0x%x\n", rc);
         return rc;
@@ -172,6 +172,11 @@ int main(int argc, char* argv[]) {
     // Инициализация консоли для отладки
     consoleInit(NULL);
     
+    // Инициализация контроллера
+    PadState pad;
+    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+    padInitializeDefault(&pad);
+    
     // Инициализация приложения
     rc = initializeApp();
     if (R_FAILED(rc)) {
@@ -179,9 +184,9 @@ int main(int argc, char* argv[]) {
         printf("Нажмите + для выхода.\n");
         
         while (appletMainLoop()) {
-            hidScanInput();
-            u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
-            if (kDown & KEY_PLUS) break;
+            padUpdate(&pad);
+            u64 kDown = padGetButtonsDown(&pad);
+            if (kDown & HidNpadButton_Plus) break;
             consoleUpdate(NULL);
         }
         
@@ -204,9 +209,9 @@ int main(int argc, char* argv[]) {
             printf("Нажмите + для выхода.\n");
             
             while (appletMainLoop()) {
-                hidScanInput();
-                u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
-                if (kDown & KEY_PLUS) break;
+                padUpdate(&pad);
+                u64 kDown = padGetButtonsDown(&pad);
+                if (kDown & HidNpadButton_Plus) break;
                 consoleUpdate(NULL);
             }
             
@@ -234,10 +239,10 @@ int main(int argc, char* argv[]) {
         updateUI();
         
         // Обработка входных данных
-        hidScanInput();
-        u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
+        padUpdate(&pad);
+        u64 kDown = padGetButtonsDown(&pad);
         
-        if (kDown & KEY_PLUS) {
+        if (kDown & HidNpadButton_Plus) {
             g_exitRequested = true;
         }
         
