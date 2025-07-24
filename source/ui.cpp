@@ -174,7 +174,7 @@ void updateUI() {
 // Обработка ввода
 void handleUIInput(u64 kDown) {
     if (g_showingProgress) {
-        if (kDown & KEY_A) {
+        if (kDown & HidNpadButton_A) {
             if (g_currentProgress.completed || g_currentProgress.error) {
                 g_showingProgress = false;
                 resetDownloadProgress();
@@ -183,15 +183,15 @@ void handleUIInput(u64 kDown) {
         return;
     }
     
-    if (kDown & KEY_UP) {
+    if (kDown & HidNpadButton_Up) {
         g_selectedMenuItem = (g_selectedMenuItem - 1 + 6) % 6;
     }
     
-    if (kDown & KEY_DOWN) {
+    if (kDown & HidNpadButton_Down) {
         g_selectedMenuItem = (g_selectedMenuItem + 1) % 6;
     }
     
-    if (kDown & KEY_A) {
+    if (kDown & HidNpadButton_A) {
         switch (g_selectedMenuItem) {
             case 0: // Язык
                 g_currentConfig.language = static_cast<Language>((g_currentConfig.language + 1) % 3);
@@ -229,12 +229,12 @@ void handleUIInput(u64 kDown) {
         }
     }
     
-    if (kDown & KEY_X) {
+    if (kDown & HidNpadButton_X) {
         // Применить настройки
         saveConfig(g_currentConfig);
     }
     
-    if (kDown & KEY_B) {
+    if (kDown & HidNpadButton_B) {
         g_exitRequested = true;
     }
 }
