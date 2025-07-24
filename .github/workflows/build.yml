@@ -1,6 +1,8 @@
 name: Build NEOVIA
 
 on:
+  push:
+    branches: [ main, master ]
   release:
     types: [created]
 
@@ -10,14 +12,30 @@ jobs:
     container: devkitpro/devkita64:latest
     
     steps:
-    - uses: actions/checkout@v4
-    - run: |
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Build
+      run: |
         sudo dkp-pacman -Syu --noconfirm
-        sudo dkp-pacman -S --noconfirm switch-dev switch-curl
+        sudo dkp-pacman -S --noconfirm switch-dev switch-curl switch-jsoncpp
         export DEVKITPRO=/opt/devkitpro
-        make
-    - uses: softprops/action-gh-release@v2
+        export DEVKITARM=/opt/devkitpro/devkitARM
+        export DEVKITPPC=/opt/devkitpro/devkitPPC
+        make clean
+        make -j4
+        
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
       with:
         files: NEOVIA.nro
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Upload artifacts
+      if: github.event_name != 'release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: NEOVIA-nro
+        path: NEOVIA.nro
