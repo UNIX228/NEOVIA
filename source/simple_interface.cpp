@@ -39,8 +39,8 @@ void SimpleInterface::checkForIcon() {
 void SimpleInterface::render() {
     framebuffer = (uint32_t*)gfxGetFramebuffer(&width, &height);
     
-    // Очистка экрана
-    uint32_t bgColor = Colors::WHITE.toRGBA();
+    // Очистка экрана (серый фон как в Switch)
+    uint32_t bgColor = Colors::SWITCH_GRAY.toRGBA();
     for (uint32_t i = 0; i < width * height; i++) {
         framebuffer[i] = bgColor;
     }
@@ -66,20 +66,17 @@ void SimpleInterface::render() {
 }
 
 void SimpleInterface::renderMainScreen() {
-    // Три полоски в левом верхнем углу
-    drawText("☰", 50, 50, Colors::BLACK, 24);
-    
     // Название по центру
     drawText("NEOVIA", 540, 200, Colors::BLACK, 48);
     
-    // Кнопка "Улучшить" по центру
-    drawButton("Улучшить", 540, 350, 200, 60, true);
+    // Кнопка "Улучшить" по центру  
+    drawButton("Улучшить", 540, 320, 200, 60, selectedItem == 0);
+    
+    // Кнопка "Меню" ниже
+    drawButton("Меню", 540, 400, 200, 60, selectedItem == 1);
 }
 
 void SimpleInterface::renderMenu() {
-    // Три полоски (активные)
-    drawText("☰", 50, 50, Colors::BLUE_ACCENT, 24);
-    
     // Логотип и название
     if (hasUserIcon) {
         drawIcon(150, 150, 64);
@@ -97,14 +94,12 @@ void SimpleInterface::renderMenu() {
 }
 
 void SimpleInterface::renderSettings() {
-    drawText("☰", 50, 50, Colors::BLACK, 24);
     drawText("Настройки", 150, 150, Colors::BLACK, 32);
     drawText("Здесь будут настройки приложения", 150, 200, Colors::TEXT_GRAY, 16);
     drawText("Нажмите B для возврата", 150, 600, Colors::TEXT_GRAY, 14);
 }
 
 void SimpleInterface::renderAbout() {
-    drawText("☰", 50, 50, Colors::BLACK, 24);
     drawText("О программе", 150, 150, Colors::BLACK, 32);
     drawText("NEOVIA v1.0.0", 150, 200, Colors::TEXT_GRAY, 20);
     drawText("Система улучшения графики для Nintendo Switch", 150, 230, Colors::TEXT_GRAY, 16);
@@ -119,11 +114,17 @@ bool SimpleInterface::handleInput(u64 kDown) {
     
     switch (currentScreen) {
         case Screen::MAIN:
-            if (kDown & HidNpadButton_Y) { // Три полоски
-                currentScreen = Screen::MENU;
-                selectedItem = 0;
-            } else if (kDown & HidNpadButton_A) { // Улучшить
-                onEnhance();
+            if (kDown & HidNpadButton_Up) {
+                selectedItem = (selectedItem - 1 + 2) % 2;
+            } else if (kDown & HidNpadButton_Down) {
+                selectedItem = (selectedItem + 1) % 2;
+            } else if (kDown & HidNpadButton_A) {
+                if (selectedItem == 0) {
+                    onEnhance(); // Улучшить
+                } else {
+                    currentScreen = Screen::MENU; // Меню
+                    selectedItem = 0;
+                }
             }
             break;
             
