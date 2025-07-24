@@ -88,9 +88,12 @@ void SimpleInterface::renderMenu() {
     drawText("NEOVIA", 230, 170, Colors::BLACK, 32);
     drawText("Graphics Enhancement System", 230, 200, Colors::TEXT_GRAY, 16);
     
+    // Линия под логотипом
+    drawRect(150, 240, 300, 2, Colors::TEXT_GRAY);
+    
     // Пункты меню
     drawButton("Настройки", 150, 280, 300, 50, selectedItem == 0);
-    drawButton("О программе", 150, 350, 300, 50, selectedItem == 1);
+    drawButton("О нас", 150, 350, 300, 50, selectedItem == 1);
 }
 
 void SimpleInterface::renderSettings() {
@@ -100,7 +103,7 @@ void SimpleInterface::renderSettings() {
 }
 
 void SimpleInterface::renderAbout() {
-    drawText("О программе", 150, 150, Colors::BLACK, 32);
+    drawText("О нас", 150, 150, Colors::BLACK, 32);
     drawText("NEOVIA v1.0.0", 150, 200, Colors::TEXT_GRAY, 20);
     drawText("Система улучшения графики для Nintendo Switch", 150, 230, Colors::TEXT_GRAY, 16);
     drawText("Нажмите B для возврата", 150, 600, Colors::TEXT_GRAY, 14);
