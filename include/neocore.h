@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-// NeoCore - Модульное графическое ядро для NEOVIA
+// NeoCore - Графический помощник для NEOVIA
+// Помогает достичь лучшей графики без разгона
 #define NEOCORE_VERSION "1.0.0"
 #define NEOCORE_AUTHOR "Unix228"
 

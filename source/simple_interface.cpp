@@ -117,23 +117,24 @@ void SimpleInterface::renderAbout() {
     drawText("NEOVIA v1.0.0", 150, 200, Colors::TEXT_GRAY, 20);
     drawText("Система улучшения графики для Nintendo Switch", 150, 230, Colors::TEXT_GRAY, 16);
     
-    // Информация о NeoCore
-    drawText("Powered by NeoCore Engine v1.0.0", 150, 280, Colors::BLUE_ACCENT, 16);
-    drawText("Модульное графическое ядро без разгона", 150, 310, Colors::TEXT_GRAY, 14);
+    // Информация о NeoCore как помощнике
+    drawText("+ NeoCore Assistant v1.0.0", 150, 280, Colors::BLUE_ACCENT, 16);
+    drawText("Графический помощник для достижения лучшей графики", 150, 310, Colors::TEXT_GRAY, 14);
     
     // Статус NeoCore
-    std::string status = "NeoCore: ";
+    std::string status = "Помощник NeoCore: ";
     Colors::Color statusColor = Colors::TEXT_GRAY;
     if (g_neoCore.isReady()) {
-        status += "Готов";
+        status += "Активен";
         statusColor = Colors::GREEN_SUCCESS;
     } else {
-        status += "Не инициализирован";
+        status += "Неактивен";
         statusColor = Colors::RED_ERROR;
     }
     drawText(status, 150, 340, statusColor, 14);
     
-    drawText("Автор: Unix228", 150, 380, Colors::TEXT_GRAY, 14);
+    drawText("Разработчик: Unix228", 150, 380, Colors::TEXT_GRAY, 14);
+    drawText("Максимальное качество без разгона", 150, 410, Colors::TEXT_GRAY, 14);
     drawText("Нажмите B для возврата", 150, 600, Colors::TEXT_GRAY, 14);
 }
 

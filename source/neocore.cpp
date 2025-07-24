@@ -24,7 +24,7 @@ NeoCoreManager::~NeoCoreManager() {
 
 bool NeoCoreManager::initialize() {
     status = NeoCoreStatus::INITIALIZING;
-    logMessage("NeoCore v" + std::string(NEOCORE_VERSION) + " инициализация...");
+    logMessage("NeoCore Assistant v" + std::string(NEOCORE_VERSION) + " инициализация...");
     
     // Создаем структуру папок
     if (!createDirectoryStructure()) {
@@ -47,7 +47,7 @@ bool NeoCoreManager::initialize() {
     }
     
     status = NeoCoreStatus::READY;
-    logMessage("NeoCore готов к работе");
+    logMessage("NeoCore Assistant готов помогать NEOVIA");
     return true;
 }
 
@@ -86,9 +86,9 @@ bool NeoCoreManager::downloadCoreFiles() {
     // Создаем базовый loader.cfg
     std::ofstream loaderFile(NEOCORE_LOADER_CFG);
     if (loaderFile.is_open()) {
-        loaderFile << "# NeoCore v" << NEOCORE_VERSION << " - Конфигурация загрузки\n";
+        loaderFile << "# NeoCore Assistant v" << NEOCORE_VERSION << " - Конфигурация\n";
         loaderFile << "# Автор: " << NEOCORE_AUTHOR << "\n";
-        loaderFile << "# Модульное графическое ядро для максимального качества\n\n";
+        loaderFile << "# Графический помощник NEOVIA для максимального качества\n\n";
         
         loaderFile << "[core]\n";
         loaderFile << "force_fps=60\n";
@@ -151,7 +151,7 @@ bool NeoCoreManager::startCore(const GameInfo& gameInfo) {
     }
     
     status = NeoCoreStatus::RUNNING;
-    logMessage("Запуск NeoCore для игры: " + gameInfo.gameName);
+    logMessage("NeoCore помогает улучшить графику для: " + gameInfo.gameName);
     
     // Отправляем информацию об игре
     if (!sendGameInfo(gameInfo)) {
@@ -172,7 +172,7 @@ bool NeoCoreManager::startCore(const GameInfo& gameInfo) {
         return false;
     }
     
-    logMessage("NeoCore успешно запущен для " + gameInfo.gameName);
+    logMessage("NeoCore успешно помогает улучшить " + gameInfo.gameName);
     return true;
 }
 
@@ -233,9 +233,9 @@ bool NeoCoreManager::createGameProfile(const std::string& gameId) {
     // Создаем конфигурацию игры
     std::ofstream configFile(profilePath + "neocore_profile.cfg");
     if (configFile.is_open()) {
-        configFile << "# NeoCore Profile for Game: " << gameId << "\n";
+        configFile << "# NeoCore Assistant Profile for Game: " << gameId << "\n";
         configFile << "# Создан автоматически NEOVIA\n";
-        configFile << "# Powered by NeoCore Engine v" << NEOCORE_VERSION << "\n\n";
+        configFile << "# Помощник NeoCore v" << NEOCORE_VERSION << "\n\n";
         
         configFile << "[graphics]\n";
         configFile << "shadows=true\n";
@@ -262,7 +262,7 @@ bool NeoCoreManager::createGameProfile(const std::string& gameId) {
         fsFsCreateDirectory(fsdevGetDeviceFileSystem("sdmc"), dir.c_str());
     }
     
-    logMessage("Создан профиль NeoCore для игры: " + gameId);
+    logMessage("NeoCore создал профиль помощи для игры: " + gameId);
     return true;
 }
 
