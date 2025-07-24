@@ -1,4 +1,5 @@
 #include "simple_interface.h"
+#include "neocore.h"
 #include <cstring>
 #include <fstream>
 
@@ -19,6 +20,12 @@ bool SimpleInterface::initialize() {
     gfxConfigureResolution(1280, 720);
     framebuffer = (uint32_t*)gfxGetFramebuffer(&width, &height);
     if (!framebuffer) return false;
+    
+    // Инициализация NeoCore
+    if (!g_neoCore.initialize()) {
+        // NeoCore не критичен для работы интерфейса
+        // Продолжаем без него
+    }
     
     // Проверка иконки
     checkForIcon();
@@ -109,6 +116,24 @@ void SimpleInterface::renderAbout() {
     drawText("О нас", 150, 150, Colors::BLACK, 32);
     drawText("NEOVIA v1.0.0", 150, 200, Colors::TEXT_GRAY, 20);
     drawText("Система улучшения графики для Nintendo Switch", 150, 230, Colors::TEXT_GRAY, 16);
+    
+    // Информация о NeoCore
+    drawText("Powered by NeoCore Engine v1.0.0", 150, 280, Colors::BLUE_ACCENT, 16);
+    drawText("Модульное графическое ядро без разгона", 150, 310, Colors::TEXT_GRAY, 14);
+    
+    // Статус NeoCore
+    std::string status = "NeoCore: ";
+    Colors::Color statusColor = Colors::TEXT_GRAY;
+    if (g_neoCore.isReady()) {
+        status += "Готов";
+        statusColor = Colors::GREEN_SUCCESS;
+    } else {
+        status += "Не инициализирован";
+        statusColor = Colors::RED_ERROR;
+    }
+    drawText(status, 150, 340, statusColor, 14);
+    
+    drawText("Автор: Unix228", 150, 380, Colors::TEXT_GRAY, 14);
     drawText("Нажмите B для возврата", 150, 600, Colors::TEXT_GRAY, 14);
 }
 
@@ -162,7 +187,21 @@ bool SimpleInterface::handleInput(u64 kDown) {
 }
 
 void SimpleInterface::onEnhance() {
-    // Запуск улучшения игр
+    // Запуск улучшения игр через NeoCore
+    if (g_neoCore.isReady()) {
+        // Создаем информацию об игре (пример)
+        GameInfo gameInfo;
+        gameInfo.gameId = "current_game";
+        gameInfo.gameName = "Detected Game";
+        gameInfo.hasCustomProfile = false;
+        gameInfo.activeMods = {"shadows", "fxaa"};
+        
+        if (g_neoCore.startCore(gameInfo)) {
+            // Успешно запущен NeoCore
+        } else {
+            // Ошибка запуска NeoCore
+        }
+    }
 }
 
 void SimpleInterface::onSettings() {

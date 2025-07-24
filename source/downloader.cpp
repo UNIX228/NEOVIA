@@ -221,6 +221,7 @@ Result createGraphicsEnhancementFiles(const std::string& titleId, const std::str
     
     if (shaderFile.is_open()) {
         shaderFile << "# NEOVIA Graphics Enhancement Shaders\n";
+        shaderFile << "# Powered by NeoCore Engine v1.0.0\n";
         shaderFile << "# Автоматически созданные шейдеры для максимального качества\n";
         shaderFile << "\n";
         shaderFile << "enhanced_lighting=true\n";
@@ -242,6 +243,7 @@ Result createGraphicsEnhancementFiles(const std::string& titleId, const std::str
     
     if (textureFile.is_open()) {
         textureFile << "# NEOVIA Texture Enhancement\n";
+        textureFile << "# Powered by NeoCore Engine v1.0.0\n";
         textureFile << "# Настройки для максимального качества текстур\n";
         textureFile << "\n";
         textureFile << "texture_resolution=4k\n";

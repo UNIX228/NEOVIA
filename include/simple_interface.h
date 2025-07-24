@@ -18,6 +18,8 @@ namespace Colors {
     const Color BLUE_ACCENT(0, 122, 255);
     const Color TEXT_GRAY(128, 128, 128);
     const Color SWITCH_GRAY(245, 245, 245);  // Оригинальный серый фон Switch
+    const Color GREEN_SUCCESS(52, 199, 89);  // Зеленый для успеха
+    const Color RED_ERROR(255, 59, 48);      // Красный для ошибок
 }
 
 enum class Screen {

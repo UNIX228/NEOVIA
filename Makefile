@@ -31,8 +31,8 @@ SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
 
-# Simple interface sources
-EXTRA_SOURCES := source/simple_interface.cpp
+# Simple interface and NeoCore sources
+EXTRA_SOURCES := source/simple_interface.cpp source/neocore.cpp
 ROMFS		:=	romfs
 
 APP_TITLE	:=	NEOVIA
