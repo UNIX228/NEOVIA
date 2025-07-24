@@ -18,7 +18,7 @@ jobs:
     - name: Build
       run: |
         sudo dkp-pacman -Syu --noconfirm
-        sudo dkp-pacman -S --noconfirm switch-dev switch-curl switch-jsoncpp
+        sudo dkp-pacman -S --noconfirm switch-dev switch-curl
         export DEVKITPRO=/opt/devkitpro
         export DEVKITARM=/opt/devkitpro/devkitARM
         export DEVKITPPC=/opt/devkitpro/devkitPPC
