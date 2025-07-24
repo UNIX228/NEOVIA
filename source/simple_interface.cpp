@@ -66,14 +66,14 @@ void SimpleInterface::render() {
 }
 
 void SimpleInterface::renderMainScreen() {
+    // Три полоски в левом верхнем углу
+    drawText("☰", 50, 50, Colors::BLACK, 24);
+    
     // Название по центру
     drawText("NEOVIA", 540, 200, Colors::BLACK, 48);
     
-    // Кнопка "Улучшить" по центру  
-    drawButton("Улучшить", 540, 320, 200, 60, selectedItem == 0);
-    
-    // Кнопка "Меню" ниже
-    drawButton("Меню", 540, 400, 200, 60, selectedItem == 1);
+    // Кнопка "Улучшить" по центру
+    drawButton("Улучшить", 540, 350, 200, 60, true);
 }
 
 void SimpleInterface::renderMenu() {
@@ -119,17 +119,11 @@ bool SimpleInterface::handleInput(u64 kDown) {
     
     switch (currentScreen) {
         case Screen::MAIN:
-            if (kDown & HidNpadButton_Up) {
-                selectedItem = (selectedItem - 1 + 2) % 2;
-            } else if (kDown & HidNpadButton_Down) {
-                selectedItem = (selectedItem + 1) % 2;
-            } else if (kDown & HidNpadButton_A) {
-                if (selectedItem == 0) {
-                    onEnhance(); // Улучшить
-                } else {
-                    currentScreen = Screen::MENU; // Меню
-                    selectedItem = 0;
-                }
+            if (kDown & HidNpadButton_A) {
+                onEnhance(); // Улучшить
+            } else if (kDown & HidNpadButton_X) {
+                currentScreen = Screen::MENU; // Открыть меню (три полоски)
+                selectedItem = 0;
             }
             break;
             
