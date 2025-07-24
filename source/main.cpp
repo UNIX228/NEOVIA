@@ -1,11 +1,10 @@
-#include <switch.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "modern_gui.h"
+#include "simple_interface.h"
 #include "config.h"
 
-extern ModernGUI g_modernGui;
+SimpleInterface g_interface;
 
 int main(int argc, char* argv[]) {
     // Инициализация системы
@@ -19,9 +18,9 @@ int main(int argc, char* argv[]) {
     // Загрузка конфигурации
     Config config = loadConfig();
     
-    // Инициализация современного GUI
-    if (!g_modernGui.initialize(&config)) {
-        printf("Ошибка инициализации графической системы!\n");
+    // Инициализация интерфейса
+    if (!g_interface.initialize()) {
+        printf("Ошибка инициализации интерфейса!\n");
         consoleUpdate(NULL);
         
         while (appletMainLoop()) {
@@ -34,9 +33,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     
-    printf("🎨 NEOVIA v1.0.0 - Система улучшения графики\n");
-    printf("💫 Современный интерфейс загружен!\n");
-    printf("🎮 Готов к работе...\n\n");
+    printf("🎮 NEOVIA v1.0.0\n");
+    printf("📱 Простой интерфейс загружен\n");
+    printf("🖼️ Иконка: %s\n", "icon.jpg найдена" );
     consoleUpdate(NULL);
     
     // Основной игровой цикл
@@ -45,22 +44,17 @@ int main(int argc, char* argv[]) {
         padUpdate(&pad);
         u64 kDown = padGetButtonsDown(&pad);
         
-        // Выход из приложения
-        if (kDown & HidNpadButton_Plus) {
-            break;
+        // Обработка ввода интерфейсом
+        if (!g_interface.handleInput(kDown)) {
+            break; // Выход из программы
         }
         
-        // Обновление GUI
-        g_modernGui.update(1.0f / 60.0f); // 60 FPS
-        
-        // Обработка ввода
-        g_modernGui.handleInput(kDown);
-        
         // Рендеринг
-        g_modernGui.render();
+        g_interface.render();
     }
     
     // Очистка ресурсов
+    g_interface.cleanup();
     consoleExit(NULL);
     return 0;
 }

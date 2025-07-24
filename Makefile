@@ -31,8 +31,8 @@ SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
 
-# Nintendo Switch native style UI sources
-EXTRA_SOURCES := source/switch_ui.cpp source/switch_main_screen.cpp
+# Simple interface sources
+EXTRA_SOURCES := source/simple_interface.cpp
 ROMFS		:=	romfs
 
 APP_TITLE	:=	NEOVIA
