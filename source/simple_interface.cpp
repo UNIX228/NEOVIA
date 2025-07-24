@@ -77,6 +77,9 @@ void SimpleInterface::renderMainScreen() {
 }
 
 void SimpleInterface::renderMenu() {
+    // Три полоски в левом верхнем углу
+    drawText("☰", 50, 50, Colors::BLUE_ACCENT, 24);
+    
     // Логотип и название
     if (hasUserIcon) {
         drawIcon(150, 150, 64);
