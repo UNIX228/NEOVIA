@@ -7,14 +7,7 @@
 #include "config.h"
 #include "downloader.h"
 #include "game_database.h"
-
-// Включаем простой GUI
-extern class SimpleGUI {
-public:
-    bool initialize(Config* cfg);
-    void render();
-    void handleInput(u64 kDown);
-} g_simpleGui;
+#include "simple_gui.h"
 
 // Глобальные переменные
 AppletHookCookie g_appletHookCookie;

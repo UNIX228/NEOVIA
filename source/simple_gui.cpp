@@ -1,26 +1,17 @@
-#include <switch.h>
+#include "simple_gui.h"
 #include <stdio.h>
 #include <string>
-#include "config.h"
 #include "downloader.h"
 #include "game_database.h"
 
-// Простой GUI на консоли
-class SimpleGUI {
-private:
-    Config* config;
-    int selectedMenuItem;
-    bool inSideMenu;
+SimpleGUI::SimpleGUI() : config(nullptr), selectedMenuItem(0), inSideMenu(false) {}
     
-public:
-    SimpleGUI() : config(nullptr), selectedMenuItem(0), inSideMenu(false) {}
-    
-    bool initialize(Config* cfg) {
-        config = cfg;
-        return true;
-    }
-    
-    void render() {
+bool SimpleGUI::initialize(Config* cfg) {
+    config = cfg;
+    return true;
+}
+
+void SimpleGUI::render() {
         consoleClear();
         
         if (inSideMenu) {
@@ -30,9 +21,9 @@ public:
         }
         
         consoleUpdate(NULL);
-    }
-    
-    void renderMainMenu() {
+}
+
+void SimpleGUI::renderMainMenu() {
         printf("\x1b[2J\x1b[H"); // Очистка экрана
         printf("\x1b[47m\x1b[30m"); // Серый фон, черный текст
         
@@ -54,9 +45,9 @@ public:
         printf("\x1b[5;5H\x1b[40m\x1b[37m☰\x1b[0m");
         
         printf("\x1b[45;1H\x1b[37mA - Выбрать  ☰ - Меню  + - Выход\x1b[0m");
-    }
-    
-    void renderSideMenu() {
+}
+
+void SimpleGUI::renderSideMenu() {
         printf("\x1b[2J\x1b[H"); // Очистка экрана
         
         // Затемненный фон
@@ -82,9 +73,9 @@ public:
         }
         
         printf("\x1b[45;1H\x1b[37mA - Выбрать  B - Назад  ↕ - Навигация\x1b[0m");
-    }
-    
-    void handleInput(u64 kDown) {
+}
+
+void SimpleGUI::handleInput(u64 kDown) {
         if (inSideMenu) {
             if (kDown & HidNpadButton_Up) {
                 selectedMenuItem = (selectedMenuItem - 1 + 2) % 2;
@@ -112,9 +103,9 @@ public:
                 selectedMenuItem = 0;
             }
         }
-    }
-    
-    void showSettings() {
+}
+
+void SimpleGUI::showSettings() {
         printf("\x1b[2J\x1b[H");
         printf("\x1b[5;30H\x1b[46m\x1b[30m ⚙️ Настройки \x1b[0m\n\n");
         
@@ -164,9 +155,9 @@ public:
                 break;
             }
         }
-    }
-    
-    void showAbout() {
+}
+
+void SimpleGUI::showAbout() {
         printf("\x1b[2J\x1b[H");
         printf("\x1b[5;30H\x1b[46m\x1b[30m ℹ️ О нас \x1b[0m\n\n");
         
@@ -192,9 +183,9 @@ public:
                 break;
             }
         }
-    }
-    
-    void enhanceGames() {
+}
+
+void SimpleGUI::enhanceGames() {
         printf("\x1b[2J\x1b[H");
         printf("\x1b[10;30HСканирование игр...\n");
         consoleUpdate(NULL);
@@ -240,9 +231,9 @@ public:
             if (kDown & HidNpadButton_A) {
                 break;
             }
-        }
-    }
-};
+                  }
+      }
+}
 
 // Глобальный GUI
 SimpleGUI g_simpleGui;
