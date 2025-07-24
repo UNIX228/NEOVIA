@@ -13,34 +13,54 @@ SimpleInterface::~SimpleInterface() {
 }
 
 bool SimpleInterface::initialize() {
+    logToGraphics("Interface", "Инициализация графического интерфейса NEOVIA...");
+    
     // Инициализация графики
     Result rc = gfxInitDefault();
-    if (R_FAILED(rc)) return false;
+    if (R_FAILED(rc)) {
+        logToGraphics("Interface", "Ошибка инициализации графики");
+        return false;
+    }
     
     gfxConfigureResolution(1280, 720);
     framebuffer = (uint32_t*)gfxGetFramebuffer(&width, &height);
-    if (!framebuffer) return false;
+    if (!framebuffer) {
+        logToGraphics("Interface", "Ошибка получения framebuffer");
+        return false;
+    }
+    
+    logToGraphics("Interface", "Графика инициализирована: 1280x720");
     
     // Инициализация NeoCore
     if (!g_neoCore.initialize()) {
-        // NeoCore не критичен для работы интерфейса
-        // Продолжаем без него
+        logToGraphics("Interface", "NeoCore не инициализирован, продолжаем без него");
+    } else {
+        logToGraphics("Interface", "NeoCore успешно интегрирован");
     }
     
     // Проверка иконки
     checkForIcon();
     
+    logToGraphics("Interface", "Интерфейс NEOVIA готов к работе");
     return true;
 }
 
 void SimpleInterface::cleanup() {
+    logToGraphics("Interface", "Очистка графического интерфейса...");
     gfxExit();
+    logToGraphics("Interface", "Графический интерфейс завершен");
 }
 
 void SimpleInterface::checkForIcon() {
     std::ifstream file("icon.jpg");
     hasUserIcon = file.good();
     file.close();
+    
+    if (hasUserIcon) {
+        logToGraphics("Interface", "Пользовательская иконка найдена: icon.jpg");
+    } else {
+        logToGraphics("Interface", "Пользовательская иконка не найдена, используется стандартная");
+    }
 }
 
 void SimpleInterface::render() {
@@ -188,8 +208,12 @@ bool SimpleInterface::handleInput(u64 kDown) {
 }
 
 void SimpleInterface::onEnhance() {
+    logToGraphics("Interface", "Пользователь нажал кнопку 'Улучшить'");
+    
     // Запуск улучшения игр через NeoCore
     if (g_neoCore.isReady()) {
+        logToGraphics("Interface", "NeoCore готов, запуск улучшения графики...");
+        
         // Создаем информацию об игре (пример)
         GameInfo gameInfo;
         gameInfo.gameId = "current_game";
@@ -198,18 +222,22 @@ void SimpleInterface::onEnhance() {
         gameInfo.activeMods = {"shadows", "fxaa"};
         
         if (g_neoCore.startCore(gameInfo)) {
-            // Успешно запущен NeoCore
+            logToGraphics("Interface", "Улучшение графики запущено успешно");
         } else {
-            // Ошибка запуска NeoCore
+            logToGraphics("Interface", "Ошибка запуска улучшения: " + g_neoCore.getLastError());
         }
+    } else {
+        logToGraphics("Interface", "NeoCore не готов, улучшение недоступно");
     }
 }
 
 void SimpleInterface::onSettings() {
+    logToGraphics("Interface", "Переход в меню настроек");
     currentScreen = Screen::SETTINGS;
 }
 
 void SimpleInterface::onAbout() {
+    logToGraphics("Interface", "Переход в меню 'О нас'");
     currentScreen = Screen::ABOUT;
 }
 

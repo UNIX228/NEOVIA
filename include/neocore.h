@@ -19,7 +19,7 @@
 #define NEOCORE_TEMP_CACHE "/graphics/NeoCore/system/temp_cache/"
 #define NEOCORE_FALLBACK "/graphics/NeoCore/system/fallback/"
 #define NEOCORE_COMM_FILE "/graphics/neocomm.msg"
-#define NEOCORE_LOG_FILE "/graphics/NeoCore/logs/core_log.txt"
+#define NEOCORE_LOG_FILE "/graphics/logs.txt"
 
 // Статусы NeoCore
 enum class NeoCoreStatus {
@@ -123,3 +123,6 @@ private:
 
 // Глобальный экземпляр NeoCore
 extern NeoCoreManager g_neoCore;
+
+// Глобальная функция логирования для всего приложения
+void logToGraphics(const std::string& component, const std::string& message);

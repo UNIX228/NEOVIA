@@ -6,6 +6,22 @@
 
 NeoCoreManager g_neoCore;
 
+// Глобальная функция логирования
+void logToGraphics(const std::string& component, const std::string& message) {
+    std::ofstream logFile(NEOCORE_LOG_FILE, std::ios::app);
+    if (logFile.is_open()) {
+        // Получаем текущее время
+        time_t now = time(0);
+        char* timeStr = ctime(&now);
+        if (timeStr) {
+            timeStr[strlen(timeStr) - 1] = '\0'; // Убираем \n
+        }
+        
+        logFile << "[" << (timeStr ? timeStr : "Unknown") << "] [" << component << "] " << message << std::endl;
+        logFile.close();
+    }
+}
+
 NeoCoreManager::NeoCoreManager() : status(NeoCoreStatus::NOT_INITIALIZED) {
     // Инициализация конфигурации по умолчанию
     config.force_fps_60 = true;
@@ -24,7 +40,6 @@ NeoCoreManager::~NeoCoreManager() {
 
 bool NeoCoreManager::initialize() {
     status = NeoCoreStatus::INITIALIZING;
-    logMessage("NeoCore Engine v" + std::string(NEOCORE_VERSION) + " - автоматическая настройка...");
     
     // Создаем необходимые папки
     if (!createDirectoryStructure()) {
@@ -32,6 +47,9 @@ bool NeoCoreManager::initialize() {
         status = NeoCoreStatus::ERROR;
         return false;
     }
+    
+    // Теперь можем логировать в созданный файл
+    logMessage("NeoCore Engine v" + std::string(NEOCORE_VERSION) + " - автоматическая настройка...");
     
     // Загружаем конфигурацию
     loadConfig();
@@ -277,18 +295,7 @@ bool NeoCoreManager::hasGameProfile(const std::string& gameId) const {
 }
 
 void NeoCoreManager::logMessage(const std::string& message) {
-    std::ofstream logFile(NEOCORE_LOG_FILE, std::ios::app);
-    if (logFile.is_open()) {
-        // Получаем текущее время
-        time_t now = time(0);
-        char* timeStr = ctime(&now);
-        if (timeStr) {
-            timeStr[strlen(timeStr) - 1] = '\0'; // Убираем \n
-        }
-        
-        logFile << "[" << (timeStr ? timeStr : "Unknown") << "] " << message << std::endl;
-        logFile.close();
-    }
+    logToGraphics("NeoCore", message);
 }
 
 bool NeoCoreManager::loadConfig() {
