@@ -96,7 +96,4 @@ NEOVIA **не разгоняет** частоты процессора, граф
 
 ---
 
-**Хештеги:**  
-`#SwitchMods` `#NoOverclock` `#GraphicsMod` `#NEOVIA` `#SwitchHacking`
-
 **NEOVIA — Графика следующего уровня. Без разгона. Только результаты.**
