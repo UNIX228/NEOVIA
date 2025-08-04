@@ -70,14 +70,10 @@ NEOVIA **не разгоняет** частоты процессора, граф
 - **Metroid Dread**
 - **Metro 2033 Redux**
 - **Metro: Last Light Redux**
-- **Metro Exodus**
 - **The Witcher 3: Wild Hunt**
 - **DOOM (2016)**
-- **DOOM Eternal**
 - **Wolfenstein II: The New Colossus**
 - **Crysis Remastered**
-- **Warframe**
-- **Apex Legends**
 - И многие другие...
 
 ---
