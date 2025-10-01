@@ -1,95 +1,150 @@
-# NEOVIA v1.0.0
+NEOVIA v1.0.0
 
-**NEOVIA** - это универсальная система улучшения графики и производительности для игр Nintendo Switch, которая повышает качество визуализации и производительность **без разгона**. Все работает из одной папки `/graphics/` на SD-карте. Все управление осуществляется через приложение NEOVIA.
+NEOVIA is a universal system for improving graphics and performance for Nintendo Switch games, enhancing visual quality and performance without overclocking. Everything works from a single /graphics/ folder on the SD card. All management is done through the NEOVIA application.
 
-NEOVIA **не разгоняет** частоты процессора, графического процессора или сенсорного экрана вашей консоли.
+NEOVIA does not overclock the CPU, GPU, or touchscreen of your console.
 
-Улучшения достигаются за счет продвинутой настройки шейдеров, текстур, уровня детализации, фильтрации и других графических компонентов.
+Improvements are achieved through advanced tuning of shaders, textures, level of detail, filtering, and other graphical components.
 
----
-
-## 📌 Основные возможности
-
-- Улучшенная графика и плавный FPS без нарушения аппаратных ограничений
-- Централизованное управление через удобное приложение
-- Профили для каждой игры: оптимизация графики, производительности или размера
-- Автоматическая загрузка улучшений при запуске игры и удаление при выходе
-- Полностью автономная папка `/graphics/`
-- Оптимизация одним нажатием для каждой игры
-- Совместимость с самыми популярными играми Switch
-- Контроль шейдеров, текстур, LOD и фильтрации
 
 ---
 
-## ⚙️ Требования
+📌 Main Features
 
-- Установленные **SaltyNX** и **SaltySD** (рекомендуется)
-- 5–10 ГБ свободного места для до 20 игр (рекомендуется)
+Enhanced graphics and smooth FPS without breaking hardware limits
 
----
+Centralized management through a user-friendly application
 
-## 🚀 Установка
+Profiles for each game: optimize for graphics, performance, or size
 
-1. Скопируйте папку `/graphics/` в корень SD-карты
-2. Убедитесь, что SaltyNX и SaltySD установлены
-3. Запустите `NEOVIA.nro` из меню Homebrew
-4. Выйдите из приложения и перезагрузите консоль
-5. Перезапустите приложение с подключением к интернету
-6. Выберите игру и профиль графики
-7. Нажмите "Enhance" — NEOVIA все сделает автоматически
-8. Запустите игру — улучшения будут применены мгновенно
+Automatic loading of enhancements on game launch and removal on exit
 
----
+Fully autonomous /graphics/ folder
 
-## 📊 Требования к хранилищу
+One-click optimization for each game
 
-| Игры | Всего |
-|---|---|
-| 1 | ~400 МБ |
-| 3 | ~1.2 ГБ |
-| 5 | ~2.0 ГБ |
-| 7 | ~2.8 ГБ |
-| 10 | ~4.0 ГБ |
-| 12 | ~4.8 ГБ |
-| 15 | ~6.0 ГБ |
-| 20 | ~8.0 ГБ |
+Compatibility with the most popular Switch games
+
+Control over shaders, textures, LOD, and filtering
+
+
 
 ---
 
-## 🎮 Поддерживаемые игры
+⚙️ Requirements
 
-- **The Legend of Zelda: Breath of the Wild**
-- **Super Mario Odyssey** 
-- **Xenoblade Chronicles 2**
-- **Splatoon 2**
-- **Mario Kart 8 Deluxe**
-- **Super Smash Bros. Ultimate**
-- **Pokémon Sword/Shield**
-- **Animal Crossing: New Horizons**
-- **Fire Emblem: Three Houses**
-- **Metroid Dread**
-- **Metro 2033 Redux**
-- **Metro: Last Light Redux**
-- **The Witcher 3: Wild Hunt**
-- **DOOM (2016)**
-- **Wolfenstein II: The New Colossus**
-- **Crysis Remastered**
-- И многие другие...
+Installed SaltyNX and SaltySD (recommended)
+
+5–10 GB of free space for up to 20 games (recommended)
+
+
 
 ---
 
-## 🌍 Языки интерфейса
+🚀 Installation
 
-- 🇷🇺 Русский
-- 🇺🇸 English  
-- 🇺🇦 Українська
+1. Copy the /graphics/ folder to the root of your SD card
+
+
+2. Make sure SaltyNX and SaltySD are installed
+
+
+3. Launch NEOVIA.nro from the Homebrew menu
+
+
+4. Exit the application and reboot the console
+
+
+5. Restart the application with an internet connection
+
+
+6. Select the game and graphics profile
+
+
+7. Press "Enhance" — NEOVIA will do everything automatically
+
+
+8. Launch the game — enhancements will be applied instantly
+
+
+
 
 ---
 
-## 📬 Контакты
+📊 Storage Requirements
 
-Есть предложения или проблемы? Создайте issue здесь на GitHub.
+Games	Total
+
+1	~400 MB
+3	~1.2 GB
+5	~2.0 GB
+7	~2.8 GB
+10	~4.0 GB
+12	~4.8 GB
+15	~6.0 GB
+20	~8.0 GB
+
+
 
 ---
 
-**NEOVIA — Графика следующего уровня. Без разгона. Только результаты.**
+🎮 Supported Games
+
+The Legend of Zelda: Breath of the Wild
+
+Super Mario Odyssey
+
+Xenoblade Chronicles 2
+
+Splatoon 2
+
+Mario Kart 8 Deluxe
+
+Super Smash Bros. Ultimate
+
+Pokémon Sword/Shield
+
+Animal Crossing: New Horizons
+
+Fire Emblem: Three Houses
+
+Metroid Dread
+
+Metro 2033 Redux
+
+Metro: Last Light Redux
+
+The Witcher 3: Wild Hunt
+
+DOOM (2016)
+
+Wolfenstein II: The New Colossus
+
+Crysis Remastered
+
+And many more...
+
+
+
+---
+
+🌍 Interface Languages
+
+🇷🇺 Russian
+
+🇺🇸 English
+
+🇺🇦 Ukrainian
+
+
+
+---
+
+📬 Contacts
+
+Have suggestions or issues? Create an issue here on GitHub.
+
+
+---
+
+NEOVIA — Next-level graphics. No overclocking. Just results.
