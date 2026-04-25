@@ -1,4 +1,4 @@
-NEOVIA v1.0.0
+Neovia V1.0.0
 
 NEOVIA is a universal system for improving graphics and performance for Nintendo Switch games, enhancing visual quality and performance without overclocking. Everything works from a single /graphics/ folder on the SD card. All management is done through the NEOVIA application.
 
@@ -133,8 +133,6 @@ And many more...
 🇷🇺 Russian
 
 🇺🇸 English
-
-🇺🇦 Ukrainian
 
 
 
